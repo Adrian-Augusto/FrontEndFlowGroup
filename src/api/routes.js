@@ -77,16 +77,17 @@ export const API_ROUTES = {
 };
 
 /**
- * URL para iniciar OAuth (navegador vai ao backend :8080, não ao Vite).
- * VITE_AUTH_GOOGLE_URL — override total, ex. https://allgrops.onrender.com/auth/google
+ * URL para iniciar OAuth — navega diretamente ao backend no Render.
+ * VITE_AUTH_GOOGLE_URL — override total, ex. https://allgrops.onrender.com/api/v1/auth/google
  * VITE_AUTH_REDIRECT_PARAM — nome do query (redirect, callbackUrl, …); vazio = sem query
  */
 export function getGoogleLoginUrl() {
   const override = import.meta.env.VITE_AUTH_GOOGLE_URL?.trim();
-  const origin = getApiOrigin() || window.location.origin;
+  // Sempre usa o backend do Render como base — nunca localhost
+  const backendOrigin = import.meta.env.VITE_API_ORIGIN?.trim() || DEFAULT_API_ORIGIN;
   const path = override || API_ROUTES.auth.google;
 
-  const base = origin.replace(/\/$/, "");
+  const base = backendOrigin.replace(/\/$/, "");
   const url = path.startsWith("http")
     ? new URL(path)
     : new URL(path.startsWith("/") ? path : `/${path}`, base);

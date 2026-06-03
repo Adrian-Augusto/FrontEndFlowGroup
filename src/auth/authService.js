@@ -1,4 +1,6 @@
 import { api } from "../api/client";
+import { API_ROUTES } from "../api/routes";
+import { DEFAULT_API_ORIGIN } from "../api/routes";
 
 /** @type {object | null} */
 let memoryUser = null;
@@ -69,7 +71,8 @@ export const authService = {
   async logout() {
     try {
       // Call backend logout endpoint to clear HttpOnly cookie
-      await fetch("/api/v1/auth/logout", {
+      const backendOrigin = import.meta.env.VITE_API_ORIGIN?.trim() || DEFAULT_API_ORIGIN;
+      await fetch(`${backendOrigin}${API_ROUTES.auth.logout}`, {
         method: "POST",
         credentials: "include",
       });
