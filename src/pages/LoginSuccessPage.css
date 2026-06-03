@@ -1,0 +1,15 @@
+.login-success {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.login-success__loading {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.login-success__error {
+  color: #b91c1c;
+}

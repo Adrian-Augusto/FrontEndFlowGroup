@@ -1,0 +1,135 @@
+.api-docs {
+  padding: 2rem 0 4rem;
+}
+
+.api-docs__inner {
+  width: min(800px, var(--container));
+  margin-inline: auto;
+}
+
+.api-docs__header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.api-docs__header p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.api-docs__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-purple-600);
+  margin: 0 0 0.25rem;
+}
+
+.api-docs__env {
+  margin-top: 1rem !important;
+  font-size: 0.875rem;
+}
+
+.api-docs__section {
+  margin-top: 2.5rem;
+}
+
+.api-docs__section h2 {
+  font-size: 1.125rem;
+  margin: 0 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.api-docs__tag {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.2rem 0.5rem;
+  background: var(--color-purple-100);
+  color: var(--color-purple-700);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.api-docs__routes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.api-route {
+  padding: 1rem;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.api-route__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.api-route__method {
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-family: ui-monospace, monospace;
+}
+
+.api-route__method--get {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.api-route__method--post {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.api-route__method--patch {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.api-route__path {
+  font-size: 0.875rem;
+}
+
+.api-route__auth {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-purple-600);
+  background: var(--color-purple-50);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+.api-route__meta {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.api-route__meta code,
+.api-docs code {
+  font-size: 0.75rem;
+  background: var(--color-bg);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.api-route__note {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+}

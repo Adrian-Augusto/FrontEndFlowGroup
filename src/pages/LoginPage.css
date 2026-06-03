@@ -1,0 +1,118 @@
+.login-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(160deg, var(--color-purple-50) 0%, var(--color-white) 50%);
+}
+
+.login-page__card {
+  width: min(100%, 920px);
+  display: grid;
+  gap: 2rem;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: visible;
+}
+
+.login-page__visual {
+  display: none;
+  padding: 2rem;
+  background: var(--color-purple-50);
+  align-items: center;
+  justify-content: center;
+}
+
+.login-page__octopus {
+  width: min(100%, 280px);
+}
+
+.login-page__content {
+  padding: 2rem 1.5rem;
+}
+
+.login-page__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.login-page__text {
+  margin: 0 0 1.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.login-page__error,
+.login-page__warn {
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+}
+
+.login-page__error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.login-page .google-signin,
+.login-page .google-signin-fallback {
+  margin-bottom: 0.25rem;
+}
+
+.login-page__dev-id {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+}
+
+.login-page__dev-id p {
+  margin: 0 0 0.5rem;
+  color: var(--color-text-muted);
+}
+
+.login-page__dev-id input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.login-page__dev-id button {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-purple-600);
+  color: white;
+  font-weight: 600;
+}
+
+.login-page__back {
+  display: inline-block;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .login-page__card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .login-page__visual {
+    display: flex;
+  }
+
+  .login-page__content {
+    padding: 2.5rem;
+  }
+}

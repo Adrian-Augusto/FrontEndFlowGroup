@@ -1,0 +1,17 @@
+.auth-callback {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.auth-callback__loading {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.auth-callback__error {
+  color: #b91c1c;
+  margin-bottom: 1rem;
+}

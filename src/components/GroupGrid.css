@@ -1,0 +1,111 @@
+.groups {
+  padding: 0 0 4rem;
+}
+
+.groups__inner {
+  width: var(--container);
+  margin-inline: auto;
+}
+
+.groups__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.groups__heading {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.groups__subheading {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.groups__create-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-purple-600);
+  color: var(--color-white);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.groups__create-btn:hover {
+  background: var(--color-purple-700);
+  box-shadow: var(--shadow-md);
+}
+
+.groups__filters {
+  margin-bottom: 1.5rem;
+}
+
+.groups__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+}
+
+.groups__empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--color-white);
+  border: 1px dashed var(--color-purple-200);
+  border-radius: var(--radius-lg);
+}
+
+.groups__empty p {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+}
+
+.groups__empty-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-purple-600);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.groups__empty-btn:hover {
+  border-color: var(--color-purple-200);
+  background: var(--color-purple-50);
+}
+
+@media (min-width: 600px) {
+  .groups__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .groups__toolbar {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: 1024px) {
+  .groups__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
