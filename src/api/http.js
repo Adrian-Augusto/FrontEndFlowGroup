@@ -2,7 +2,7 @@
  * Fetch com cookies de sessão (HttpOnly) enviados pelo backend.
  * O frontend NUNCA lê nem grava access_token — apenas credentials: 'include'.
  */
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? "";
+const API_ORIGIN = import.meta.env.VITE_API_ORIGIN?.trim() || "https://allgrops.onrender.com";
 
 export async function apiFetch(path, options = {}) {
   const url = path.startsWith("http") ? path : `${API_ORIGIN}${path}`;

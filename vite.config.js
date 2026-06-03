@@ -14,18 +14,14 @@ export default defineConfig(({ mode }) => {
       },
       proxy: {
         "/api": {
-          target: env.VITE_PROXY_TARGET || "http://localhost:8080",
+          target: env.VITE_PROXY_TARGET || "https://allgrops.onrender.com",
           changeOrigin: true,
-          secure: false,
-          onProxyReq: (proxyReq, req, res) => {
-            // Vite's default max header size; Node.js allows increasing it via:
-            // NODE_OPTIONS="--max-http-header-size=16384"
-          },
+          secure: true,
         },
         "/uploads": {
-          target: env.VITE_PROXY_TARGET || "http://localhost:8080",
+          target: env.VITE_PROXY_TARGET || "https://allgrops.onrender.com",
           changeOrigin: true,
-          secure: false,
+          secure: true,
         },
       },
     },

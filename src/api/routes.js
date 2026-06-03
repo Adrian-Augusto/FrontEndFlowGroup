@@ -3,6 +3,7 @@
  * Base padrão: /api/v1 (Nest na porta 8080).
  */
 export const API_BASE = (import.meta.env.VITE_API_URL ?? "/api/v1").replace(/\/$/, "");
+export const DEFAULT_API_ORIGIN = "https://allgrops.onrender.com";
 
 /** Monta path tipo /api/auth/google ou /auth/google se API_BASE vazio */
 export function apiPath(...segments) {
@@ -11,7 +12,7 @@ export function apiPath(...segments) {
 }
 
 export function getApiOrigin() {
-  return import.meta.env.VITE_API_ORIGIN?.trim() || "";
+  return import.meta.env.VITE_API_ORIGIN?.trim() || DEFAULT_API_ORIGIN;
 }
 
 export const API_ROUTES = {
@@ -77,7 +78,7 @@ export const API_ROUTES = {
 
 /**
  * URL para iniciar OAuth (navegador vai ao backend :8080, não ao Vite).
- * VITE_AUTH_GOOGLE_URL — override total, ex. http://localhost:8080/auth/google
+ * VITE_AUTH_GOOGLE_URL — override total, ex. https://allgrops.onrender.com/auth/google
  * VITE_AUTH_REDIRECT_PARAM — nome do query (redirect, callbackUrl, …); vazio = sem query
  */
 export function getGoogleLoginUrl() {
