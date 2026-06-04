@@ -99,12 +99,25 @@ export const authService = {
       if (!user) {
         throw new Error("Usuário não autenticado ou resposta inválida");
       }
-      console.log("[authService] Usuário extraído:", user);
+      console.log("[authService] Usuário extraído:", {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        termos_aceitos: user.termos_aceitos,
+        termsAccepted: user.termsAccepted,
+      });
       memoryUser = user;
-      console.log("[authService] Usuário definido na memória:", memoryUser);
+      console.log("[authService] Usuário definido na memória:", {
+        id: memoryUser.id,
+        email: memoryUser.email,
+        name: memoryUser.name,
+        role: memoryUser.role,
+        termos_aceitos: memoryUser.termos_aceitos,
+        termsAccepted: memoryUser.termsAccepted,
+      });
       
-      // Retorna user e token se disponível
-      return { user: memoryUser, token: response?.token ?? null };
+      return memoryUser;
     } catch (err) {
       // Se for apenas uma falha de autenticação comum (não logado), registrar apenas como informação
       const isExpectedAuthFailure = 

@@ -27,8 +27,10 @@ export function DashboardPage() {
   const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
-    refreshProfile().finally(() => setProfileLoading(false));
-  }, [refreshProfile]);
+    // Não chamamos refreshProfile aqui para evitar conflito de estado
+    // O usuário já está disponível via AuthContext
+    setProfileLoading(false);
+  }, []);
 
   if (loading || profileLoading) {
     return (

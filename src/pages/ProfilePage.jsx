@@ -93,8 +93,10 @@ export function ProfilePage() {
   };
 
   useEffect(() => {
-    refreshProfile().finally(() => setFetching(false));
-  }, [refreshProfile]);
+    // Não chamamos refreshProfile aqui para evitar conflito de estado
+    // O usuário já está disponível via AuthContext
+    setFetching(false);
+  }, []);
 
   useEffect(() => {
     if (user) {

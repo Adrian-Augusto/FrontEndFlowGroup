@@ -6,7 +6,7 @@ import { normalizeGroup, normalizeGroups } from "../utils/groupNormalize";
 import { normalizeUser } from "../utils/userNormalize";
 import { fileToDataUrl } from "../utils/fileToDataUrl";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 const STORAGE_GROUPS = "octo_groups_v3";
 
 function delay(ms = 280) {
