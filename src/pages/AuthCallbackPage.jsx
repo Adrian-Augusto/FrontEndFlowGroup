@@ -22,10 +22,17 @@ export function AuthCallbackPage() {
       const errorParam = params.get("error");
       const tokenParam = params.get("token");
 
+      console.log("[AuthCallbackPage] OAuth callback iniciado", {
+        hasToken: !!tokenParam,
+        hasError: !!errorParam,
+      });
+
       // ── 1.5. Se backend enviou token na query, armazena em sessionStorage ─
       if (tokenParam) {
-        console.log("[AuthCallbackPage] Token recebido do backend via query param");
+        console.log("[AuthCallbackPage] ✓ Token recebido via ?token= query param");
         authService.setAccessToken(tokenParam);
+      } else {
+        console.log("[AuthCallbackPage] Token será enviado via HttpOnly cookie + withCredentials");
       }
 
       // ── 2. Limpa a URL imediatamente (segurança) ─────────────────
@@ -47,7 +54,13 @@ export function AuthCallbackPage() {
       }
 
       try {
-        // ── 4. Busca perfil via cookie HttpOnly ou Bearer token ──
+        // ── 4. Aguarda um pouco para cookies serem definidos ──
+        // Em alguns casos, o cookie pode chegar após o redirect
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        console.log("[AuthCallbackPage] Buscando perfil do backend...");
+
+        // ── 5. Busca perfil via cookie HttpOnly ou Bearer token ──
         // refreshProfile agora retorna o usuário e armazena token automaticamente
         const user = await refreshProfile();
 
@@ -55,13 +68,20 @@ export function AuthCallbackPage() {
           throw new Error("Perfil não encontrado após autenticação.");
         }
 
-        console.log("[AuthCallbackPage] ✓ Usuário autenticado com sucesso:", user);
+        console.log("[AuthCallbackPage] ✓ Usuário autenticado com sucesso:", user.email || user.id);
 
-        // ── 5. Redireciona para home ─────────────────────────────
+        // ── 6. Redireciona para home ─────────────────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
 
       } catch (err) {
-        console.error("[AuthCallbackPage] Erro durante callback:", err);
+        console.error("[AuthCallbackPage] ✗ Erro durante callback:", err.message);
+        
+        // Debug: mostrar status do auth
+        console.debug("[AuthCallbackPage] Debug info:", {
+          token: authService.getAccessToken() ? "presente" : "ausente",
+          cookies: document.cookie ? document.cookie.substring(0, 50) : "nenhum",
+        });
+
         setStatus("error");
         setErrorMsg("Não foi possível concluir o login. Tente novamente.");
         setTimeout(() => {

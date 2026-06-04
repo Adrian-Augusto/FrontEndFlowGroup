@@ -32,14 +32,10 @@ export function AuthProvider({ children }) {
     setProfileError(null);
 
     try {
-      const response = await authService.getCurrentUser();
-      if (response?.user) {
-        syncUser(response.user);
-        // Armazena token se disponível
-        if (response.token) {
-          authService.setAccessToken(response.token);
-        }
-        return response.user;
+      const user = await authService.getCurrentUser();
+      if (user) {
+        syncUser(user);
+        return user;
       }
       setUser(null);
       setProfileError("Sessão expirada ou inválida.");
@@ -52,10 +48,20 @@ export function AuthProvider({ children }) {
   }, [syncUser]);
 
   useEffect(() => {
+    // Se já temos usuário em memória, não precisamos chamar a API
+    const existingUser = authService.getUser();
+    if (existingUser) {
+      console.log("[AuthContext] Usuário já em memória, usando cache");
+      syncUser(existingUser);
+      setLoading(false);
+      return;
+    }
+
     refreshProfile()
       .catch(() => null)
       .finally(() => setLoading(false));
-  }, [refreshProfile]);
+  }, [refreshProfile, syncUser]);
+
 
   // Listen for logout events (triggered by 401/403 responses from API)
   useEffect(() => {
