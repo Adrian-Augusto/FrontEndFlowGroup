@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { termsApi } from "../api/termsApi";
@@ -73,7 +73,7 @@ const DEFAULT_TERMS_CONTENT = {
 
 export function TermsPage() {
   const navigate = useNavigate();
-  const { user, acceptTerms } = useAuth();
+  const { user, acceptTerms, syncUser } = useAuth();
   const [activeTab, setActiveTab] = useState("terms");
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -83,6 +83,22 @@ export function TermsPage() {
     privacy: false,
     refund: false
   });
+
+  // Verificar status dos termos ao carregar a página
+  useEffect(() => {
+    const checkTermsStatus = async () => {
+      try {
+        const status = await termsApi.getStatus();
+        if (status?.termsAccepted) {
+          // Usuário já aceitou os termos, redireciona para home
+          navigate("/", { replace: true });
+        }
+      } catch (err) {
+        // Erro ao verificar status, continua mostrando a página
+      }
+    };
+    checkTermsStatus();
+  }, [navigate]);
 
   // Verificar scroll para cada aba
   const handleScroll = (tabId, e) => {
