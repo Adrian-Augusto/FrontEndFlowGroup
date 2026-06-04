@@ -9,7 +9,6 @@ import { AdminRoute } from "./components/AdminRoute";
 import { AppLayout } from "./layouts/AppLayout";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
-import { LoginSuccessPage } from "./pages/LoginSuccessPage";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
 import { TermsPage } from "./pages/TermsPage";
 import { ProfilePage } from "./pages/ProfilePage";
@@ -29,7 +28,6 @@ export default function App() {
             <SubscriptionProvider>
               <GroupsProvider>
                 <Routes>
-                  <Route path="login-success" element={<LoginSuccessPage />} />
                   <Route path="auth/callback" element={<AuthCallbackPage />} />
                   <Route path="termos" element={<TermsPage />} />
                   <Route element={<AppLayout />}>

@@ -267,7 +267,8 @@ app.post("/api/v1/auth/login", (req, res) => {
   
   const token = createMockJwt(user);
   createSession(res, user);
-  res.json({ user, accessToken: token });
+  // Não retornar accessToken na resposta - usar apenas cookie HttpOnly
+  res.json({ user });
 });
 
 /** Inicia OAuth — mock redireciona direto ao callback do front */
