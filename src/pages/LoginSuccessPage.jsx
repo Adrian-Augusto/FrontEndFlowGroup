@@ -18,6 +18,12 @@ export function LoginSuccessPage() {
       try {
         const params = new URLSearchParams(window.location.search);
         const token = params.get("token") || params.get("accessToken");
+
+        // ⚠️ Remove token da URL IMEDIATAMENTE — nunca deve ficar visível
+        if (params.has("token") || params.has("accessToken")) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
         if (token) {
           localStorage.setItem("accessToken", token);
         }

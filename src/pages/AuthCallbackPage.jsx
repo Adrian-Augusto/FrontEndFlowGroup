@@ -11,6 +11,12 @@ export function AuthCallbackPage() {
 
   useEffect(() => {
     const token = searchParams.get("token") || searchParams.get("accessToken");
+
+    // ⚠️ Remove token da URL IMEDIATAMENTE
+    if (searchParams.has("token") || searchParams.has("accessToken")) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     if (token) {
       localStorage.setItem("accessToken", token);
     }
