@@ -6,7 +6,7 @@ import "./LoginSuccessPage.css";
 export function LoginSuccessPage() {
   const navigate = useNavigate();
   const { refreshProfile } = useAuth();
-  const [status, setStatus] = useState("loading"); // "loading" | "error"
+  const [status, setStatus] = useState("loading");
   const [errorMsg, setErrorMsg] = useState("");
   const handled = useRef(false);
 
@@ -15,27 +15,38 @@ export function LoginSuccessPage() {
     handled.current = true;
 
     (async () => {
-      // ── 1. Remove qualquer token da URL IMEDIATAMENTE (segurança) ──
+      // ── 1. Captura o token ANTES de limpar a URL ─────────────────
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+
+      // ── 2. Limpa a URL imediatamente (segurança) ──────────────────
       window.history.replaceState({}, document.title, window.location.pathname);
 
+      // ── 3. Valida token ───────────────────────────────────────────
+      if (!token) {
+        navigate("/login?error=missing_token", { replace: true });
+        return;
+      }
+
+      // ── 4. Salva token no localStorage ────────────────────────────
+      localStorage.setItem("accessToken", token);
+
       try {
-        // ── 2. Busca perfil usando cookie HttpOnly (NÃO token da URL) ──
+        // ── 5. Busca perfil (agora o interceptor já tem o Bearer) ───
         const user = await refreshProfile();
 
         if (!user) {
           throw new Error("Perfil não encontrado após autenticação.");
         }
 
-        // ── 3. Redireciona para área autenticada ──────────────────
+        // ── 6. Redireciona para home ──────────────────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
 
       } catch (err) {
-        // ── 4. Tratamento de erro ─────────────────────────────────
-        console.error("[LoginSuccessPage] Erro ao processar autenticação:", err);
-
+        console.error("[LoginSuccessPage] Erro:", err);
+        localStorage.removeItem("accessToken"); // limpa token inválido
         setStatus("error");
         setErrorMsg("Não foi possível autenticar. Tente novamente.");
-
         setTimeout(() => {
           navigate("/login", { replace: true });
         }, 2500);
@@ -43,7 +54,6 @@ export function LoginSuccessPage() {
     })();
   }, [navigate, refreshProfile]);
 
-  // ── UI ─────────────────────────────────────────────────────────────
   if (status === "error") {
     return (
       <div className="login-success">

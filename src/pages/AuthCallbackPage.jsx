@@ -15,17 +15,18 @@ export function AuthCallbackPage() {
     handled.current = true;
 
     (async () => {
-      // ── 1. Remove qualquer token da URL IMEDIATAMENTE (segurança) ──
+      // ── 1. Captura params ANTES de limpar a URL ──────────────────
+      const params = new URLSearchParams(window.location.search);
+      const errorParam = params.get("error");
+
+      // ── 2. Limpa a URL imediatamente (segurança) ─────────────────
       window.history.replaceState(
         {},
         document.title,
         window.location.pathname
       );
 
-      // ── 2. Verifica se há erro vindo do backend ───────────────────
-      const params = new URLSearchParams(window.location.search);
-      const errorParam = params.get("error");
-
+      // ── 3. Verifica erro vindo do backend ────────────────────────
       if (errorParam) {
         navigate(`/login?error=${encodeURIComponent(errorParam)}`, {
           replace: true,
@@ -34,14 +35,14 @@ export function AuthCallbackPage() {
       }
 
       try {
-        // ── 3. Busca perfil usando cookie HttpOnly (NÃO token da URL) ──
+        // ── 4. Busca perfil via cookie HttpOnly (sem token na URL) ──
         const user = await refreshProfile();
 
         if (!user) {
           throw new Error("Perfil não encontrado após autenticação.");
         }
 
-        // ── 4. Redireciona para home ───────────────────────────────
+        // ── 5. Redireciona para home ─────────────────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
 
       } catch (err) {
