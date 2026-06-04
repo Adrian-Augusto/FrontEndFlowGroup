@@ -20,6 +20,9 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
+// Suporte a múltiplos origins separados por vírgula
+const allowedOrigins = CLIENT_ORIGIN.split(",").map(origin => origin.trim());
+
 // Setup para __dirname (ESM)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,7 +43,20 @@ const sessions = new Map();
 const userSubscriptions = new Map();
 const app = express();
 
-app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
+app.use(cors({ 
+  origin: (origin, callback) => {
+    // Permitir requisições sem origin (ex: mobile apps, curl)
+    if (!origin) return callback(null, true);
+    
+    // Verificar se origin está na lista de allowedOrigins
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true 
+}));
 app.use(cookieParser());
 
 // Servir arquivos estáticos - /uploads aponta para server/public/uploads
