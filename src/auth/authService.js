@@ -62,6 +62,20 @@ export const authService = {
     return memoryUser;
   },
 
+  /**
+   * Define token de acesso no sessionStorage
+   */
+  setAccessToken(token) {
+    tokenStorage.setAccessToken(token);
+  },
+
+  /**
+   * Obtém token de acesso do sessionStorage
+   */
+  getAccessToken() {
+    return tokenStorage.getAccessToken();
+  },
+
   clearSession() {
     memoryUser = null;
     tokenStorage.clear();
@@ -73,13 +87,14 @@ export const authService = {
 
   /**
    * Busca perfil do usuário do backend para verificar autenticação
+   * Retorna { user, token } onde token pode ser nulo se não disponível
    */
   async getCurrentUser() {
     try {
       console.log("[authService] Buscando perfil do usuário...");
       const response = await api.getGoogleProfile();
       console.log("[authService] Resposta do perfil:", response);
-      // getGoogleProfile já retorna { data: user, raw: response }
+      // getGoogleProfile retorna { data: user, raw: response, token? }
       const user = response?.data;
       if (!user) {
         throw new Error("Usuário não autenticado ou resposta inválida");
@@ -87,7 +102,9 @@ export const authService = {
       console.log("[authService] Usuário extraído:", user);
       memoryUser = user;
       console.log("[authService] Usuário definido na memória:", memoryUser);
-      return memoryUser;
+      
+      // Retorna user e token se disponível
+      return { user: memoryUser, token: response?.token ?? null };
     } catch (err) {
       // Se for apenas uma falha de autenticação comum (não logado), registrar apenas como informação
       const isExpectedAuthFailure = 
@@ -101,7 +118,7 @@ export const authService = {
         console.error("[authService] Erro inesperado ao buscar usuário:", err);
       }
       memoryUser = null;
-      throw new Error("Usuário não autenticado ou resposta inválida");
+      throw new Error("Usuário não autenticado ou resposta inválida", { cause: err });
     }
   },
 

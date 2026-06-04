@@ -87,7 +87,7 @@ export const api = {
     return normalizeAuthResponse(data);
   },
 
-  /** Perfil autenticado (GET /api/v1/auth/google/profile) */
+  /** Perfil autenticado (GET /api/v1/users/me) */
   async getGoogleProfile() {
     const data = await request(API_ROUTES.auth.googleProfile, {
       skipConsoleError: true,
@@ -96,9 +96,11 @@ export const api = {
     // Backend pode retornar {user: {...}} ou apenas o usuário direto
     const user = data?.user || data?.data || data;
     if (!user || typeof user !== "object") {
-      throw new Error("Invalid API response: missing user data");
+      throw new Error("Invalid API response: missing user data", { cause: data });
     }
-    return { data: normalizeUser(user), raw: data };
+    // Extrai token se disponível (backend pode retornar token na resposta)
+    const token = data?.accessToken ?? data?.access_token ?? data?.token ?? null;
+    return { data: normalizeUser(user), raw: data, token };
   },
 
   /** @deprecated use getGoogleProfile */

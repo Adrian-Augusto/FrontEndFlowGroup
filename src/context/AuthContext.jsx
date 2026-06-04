@@ -32,10 +32,14 @@ export function AuthProvider({ children }) {
     setProfileError(null);
 
     try {
-      const currentUser = await authService.getCurrentUser();
-      if (currentUser) {
-        syncUser(currentUser);
-        return currentUser;
+      const response = await authService.getCurrentUser();
+      if (response?.user) {
+        syncUser(response.user);
+        // Armazena token se disponível
+        if (response.token) {
+          authService.setAccessToken(response.token);
+        }
+        return response.user;
       }
       setUser(null);
       setProfileError("Sessão expirada ou inválida.");

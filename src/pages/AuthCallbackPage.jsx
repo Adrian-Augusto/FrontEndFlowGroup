@@ -39,18 +39,21 @@ export function AuthCallbackPage() {
       }
 
       try {
-        // ── 4. Busca perfil via cookie HttpOnly (sem token na URL) ──
+        // ── 4. Busca perfil via cookie HttpOnly + extrai token ──
+        // refreshProfile agora retorna o usuário e armazena token automaticamente
         const user = await refreshProfile();
 
         if (!user) {
           throw new Error("Perfil não encontrado após autenticação.");
         }
 
+        console.log("[AuthCallbackPage] ✓ Usuário autenticado com sucesso:", user);
+
         // ── 5. Redireciona para home ─────────────────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
 
       } catch (err) {
-        console.error("[AuthCallbackPage] Erro:", err);
+        console.error("[AuthCallbackPage] Erro durante callback:", err);
         setStatus("error");
         setErrorMsg("Não foi possível concluir o login. Tente novamente.");
         setTimeout(() => {
