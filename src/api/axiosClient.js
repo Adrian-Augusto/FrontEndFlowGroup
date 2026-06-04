@@ -4,14 +4,14 @@ import { API_BASE, getApiOrigin } from "./routes";
 export const AUTH_LOGOUT_EVENT = "auth:logout";
 
 /**
- * baseURL vazio → URLs relativas (/api/v1/...) passam pelo proxy do Vite em dev.
- * Só use VITE_API_ORIGIN se o backend tiver CORS configurado para o front.
+ * baseURL aponta para o backend no Render.
+ * withCredentials apenas quando NÃO há Bearer token (modo cookie).
  */
 const baseURL = getApiOrigin() || "";
 
 export const httpClient = axios.create({
   baseURL,
-  withCredentials: true, // HttpOnly cookies
+  withCredentials: false, // JWT via Bearer — sem cookie cross-site
   timeout: 30000,
   headers: { Accept: "application/json" },
 });
@@ -20,6 +20,11 @@ httpClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    // Com Bearer token, não precisamos de cookies cross-site
+    config.withCredentials = false;
+  } else {
+    // Sem token: tenta cookie (sessão legacy)
+    config.withCredentials = true;
   }
 
   if (
@@ -29,8 +34,6 @@ httpClient.interceptors.request.use((config) => {
   ) {
     config.headers["Content-Type"] = "application/json";
   }
-
-
 
   return config;
 });
