@@ -118,7 +118,7 @@ export function TermsPage() {
     try {
       await acceptTerms?.();
       // Backend mantém o estado de termos_aceitos
-      // Não armazenar em localStorage para evitar inconsistência com backend
+      // Atualiza usuário localmente para refletir mudança imediata
       setTimeout(() => {
         navigate("/", { replace: true });
       }, 500);

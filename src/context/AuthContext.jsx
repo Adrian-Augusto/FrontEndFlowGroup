@@ -108,9 +108,12 @@ export function AuthProvider({ children }) {
     try {
       await termsApi.acceptTerms();
 
-      // Atualizar usuário localmente com termos aceitos
+      // Atualizar usuário localmente com termos aceitos (otimização)
       const updatedUser = { ...user, termos_aceitos: true };
       syncUser(updatedUser);
+
+      // Também atualiza authService.memoryUser para consistência
+      authService.setUser(updatedUser);
 
       return true;
     } catch (err) {

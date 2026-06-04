@@ -66,6 +66,7 @@ export function AuthCallbackPage() {
         }
 
         console.log("[AuthCallbackPage] ✓ Usuário autenticado com sucesso:", user.email || user.id);
+        console.log("[AuthCallbackPage] termos_aceitos:", user.termos_aceitos, "termsAccepted:", user.termsAccepted);
 
         // ── 6. Verifica se usuário aceitou termos ─────────────────
         // Só redireciona para termos se backend indicar que não aceitou
