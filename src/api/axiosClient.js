@@ -23,7 +23,7 @@ httpClient.interceptors.request.use((config) => {
     // Com Bearer token, não precisamos de cookies cross-site
     config.withCredentials = false;
   } else {
-    // Sem token: tenta cookie (sessão legacy)
+    // Sem token: tenta cookie (sessão HttpOnly)
     config.withCredentials = true;
   }
 
@@ -34,6 +34,14 @@ httpClient.interceptors.request.use((config) => {
   ) {
     config.headers["Content-Type"] = "application/json";
   }
+
+  // Debug: log request details
+  console.log("[axiosClient] Request:", {
+    url: config.url,
+    method: config.method,
+    withCredentials: config.withCredentials,
+    hasAuthHeader: !!config.headers.Authorization,
+  });
 
   return config;
 });
