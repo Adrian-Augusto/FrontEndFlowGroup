@@ -14,14 +14,15 @@ import { orderGroups, validatePagination } from "./utils/groupOrdering.js";
 
 const PORT = Number(process.env.PORT) || 8080;
 const SERVER_ORIGIN = process.env.SERVER_ORIGIN || `http://localhost:${Number(process.env.PORT) || 8080}`;
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+const CLIENT_ORIGINS_STR = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
   .split(",")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);
 
 // Suporte a múltiplos origins separados por vírgula
-const allowedOrigins = CLIENT_ORIGIN.split(",").map(origin => origin.trim());
+const allowedOrigins = CLIENT_ORIGINS_STR.split(",").map(origin => origin.trim());
+const CLIENT_ORIGIN = allowedOrigins[0]; // Usa o primeiro como padrão
 
 // Setup para __dirname (ESM)
 const __filename = fileURLToPath(import.meta.url);
@@ -203,6 +204,36 @@ function clearSession(req, res) {
   res.clearCookie("access_token", { path: "/" });
 }
 
+/**
+ * Retorna o client origin correto baseado no request
+ * Prioridade: origin header > referer header > primeira origin configurada
+ */
+function getClientOriginForRequest(req) {
+  const requestOrigin = req.get("origin");
+  const referer = req.get("referer");
+  
+  // Se origin header está nos allowed origins, usa
+  if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+    return requestOrigin;
+  }
+  
+  // Se referer está em algum allowed origin, extrai o origin
+  if (referer) {
+    try {
+      const refererUrl = new URL(referer);
+      const refererOrigin = refererUrl.origin;
+      if (allowedOrigins.includes(refererOrigin)) {
+        return refererOrigin;
+      }
+    } catch {
+      // Referer inválido, usar padrão
+    }
+  }
+  
+  // Fallback para primeira origin configurada (ou localhost:5173)
+  return CLIENT_ORIGIN;
+}
+
 const mockUser = {
   id: "585d872a-d94f-4d25-8f1c-a7ac3119d26d",
   name: "Adrian Silva",
@@ -273,9 +304,10 @@ app.post("/api/v1/auth/login", (req, res) => {
 
 /** Inicia OAuth — mock redireciona direto ao callback do front */
 app.get("/api/v1/auth/google", (req, res) => {
+  const clientOrigin = getClientOriginForRequest(req);
   const redirect =
     req.query.redirect ||
-    `${CLIENT_ORIGIN}/auth/callback?next=${encodeURIComponent("/")}`;
+    `${clientOrigin}/auth/callback?next=${encodeURIComponent("/")}`;
 
   console.log("[AUTH] Google OAuth iniciado, redirect:", redirect);
   const user = { ...mockUser };
@@ -287,7 +319,8 @@ app.get("/api/v1/auth/google", (req, res) => {
 });
 
 app.get("/api/v1/auth/google/callback", (req, res) => {
-  const front = `${CLIENT_ORIGIN}/auth/callback?next=/`;
+  const clientOrigin = getClientOriginForRequest(req);
+  const front = `${clientOrigin}/auth/callback?next=/`;
   if (!getUser(req)) createSession(res, mockUser);
   res.redirect(front);
 });

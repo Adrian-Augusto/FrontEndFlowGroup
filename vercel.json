@@ -1,0 +1,20 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "outputDirectory": "dist",
+  "env": {
+    "VITE_API_ORIGIN": "@vite_api_origin",
+    "VITE_PROXY_TARGET": "@vite_proxy_target",
+    "VITE_AUTH_GOOGLE_URL": "@vite_auth_google_url",
+    "VITE_AUTH_REDIRECT_PARAM": "@vite_auth_redirect_param",
+    "VITE_API_URL": "@vite_api_url",
+    "VITE_USE_MOCK": "@vite_use_mock",
+    "VITE_AUTH_STORAGE": "@vite_auth_storage"
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
