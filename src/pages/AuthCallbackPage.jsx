@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { authService } from "../auth/authService";
 import { escapeHtml } from "../utils/securityValidators";
 import "./AuthCallbackPage.css";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
-  const { loginWithGoogle } = useAuth();
+  const { refreshProfile } = useAuth();
   const [status, setStatus] = useState("loading"); // "loading" | "error"
+  const [errorMsg, setErrorMsg] = useState("");
   const handled = useRef(false);
 
   useEffect(() => {
@@ -18,7 +20,13 @@ export function AuthCallbackPage() {
       // ── 1. Captura params ANTES de limpar a URL ──────────────────
       const params = new URLSearchParams(window.location.search);
       const errorParam = params.get("error");
-      const code = params.get("code");
+      const tokenParam = params.get("token");
+
+      // ── 1.5. Se backend enviou token na query, armazena em sessionStorage ─
+      if (tokenParam) {
+        console.log("[AuthCallbackPage] Token recebido do backend via query param");
+        authService.setAccessToken(tokenParam);
+      }
 
       // ── 2. Limpa a URL imediatamente (segurança) ─────────────────
       window.history.replaceState(
@@ -39,35 +47,37 @@ export function AuthCallbackPage() {
       }
 
       try {
-        if (!code) {
-          throw new Error("Código de autenticação (code) ausente na URL.");
+        // ── 4. Busca perfil via cookie HttpOnly ou Bearer token ──
+        // refreshProfile agora retorna o usuário e armazena token automaticamente
+        const user = await refreshProfile();
+
+        if (!user) {
+          throw new Error("Perfil não encontrado após autenticação.");
         }
 
-        console.log("[AuthCallbackPage] Validando código de autenticação do Google...");
-        
-        // Chamada ao AuthContext para enviar o code ao backend e sincronizar dados
-        await loginWithGoogle(code);
+        console.log("[AuthCallbackPage] ✓ Usuário autenticado com sucesso:", user);
 
-        console.log("[AuthCallbackPage] ✓ Usuário autenticado e sincronizado com sucesso.");
-
-        // ── 4. Redireciona para home ──────────────────────────────
+        // ── 5. Redireciona para home ─────────────────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
+
       } catch (err) {
         console.error("[AuthCallbackPage] Erro durante callback:", err);
-        navigate("/login?error=auth_failed", { replace: true });
+        setStatus("error");
+        setErrorMsg("Não foi possível concluir o login. Tente novamente.");
+        setTimeout(() => {
+          navigate("/login?error=auth_failed", { replace: true });
+        }, 2500);
       }
     })();
-  }, [navigate, loginWithGoogle]);
+  }, [navigate, refreshProfile]);
 
-  // ── UI: spinner enquanto valida ─────────────────────────────────────
+  // ── UI ──────────────────────────────────────────────────────────────
   if (status === "error") {
     return (
       <div className="auth-callback">
         <div className="auth-callback__error-box">
           <span className="auth-callback__error-icon">⚠️</span>
-          <p className="auth-callback__error">
-            Não foi possível concluir o login. Tente novamente.
-          </p>
+          <p className="auth-callback__error">{errorMsg}</p>
           <p className="auth-callback__redirect-msg">
             Redirecionando para o login…
           </p>

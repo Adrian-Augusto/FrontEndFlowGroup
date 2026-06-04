@@ -1,5 +1,4 @@
 import { api } from "../api/client";
-import { apiRequest } from "../api/axiosClient";
 import { API_ROUTES } from "../api/routes";
 import { DEFAULT_API_ORIGIN } from "../api/routes";
 
@@ -7,13 +6,19 @@ import { DEFAULT_API_ORIGIN } from "../api/routes";
 let memoryUser = null;
 
 /**
- * Token storage utilities - uses localStorage for persistence
+ * Token storage utilities - uses sessionStorage for XSS protection
+ * sessionStorage is cleared when the browser tab closes
  */
 const tokenStorage = {
+  /**
+   * Store access token in sessionStorage (not localStorage)
+   * sessionStorage is not accessible from other tabs/windows
+   * and is cleared on browser close
+   */
   setAccessToken(token) {
     if (!token || typeof token !== "string") return;
     try {
-      localStorage.setItem("accessToken", token);
+      sessionStorage.setItem("accessToken", token);
     } catch (err) {
       console.error("[authService] Erro ao salvar token:", err);
     }
@@ -21,7 +26,7 @@ const tokenStorage = {
 
   getAccessToken() {
     try {
-      return localStorage.getItem("accessToken");
+      return sessionStorage.getItem("accessToken");
     } catch (err) {
       console.error("[authService] Erro ao recuperar token:", err);
       return null;
@@ -30,7 +35,7 @@ const tokenStorage = {
 
   removeAccessToken() {
     try {
-      localStorage.removeItem("accessToken");
+      sessionStorage.removeItem("accessToken");
     } catch (err) {
       console.error("[authService] Erro ao remover token:", err);
     }
@@ -38,7 +43,7 @@ const tokenStorage = {
 
   clear() {
     try {
-      localStorage.removeItem("accessToken");
+      sessionStorage.removeItem("accessToken");
     } catch (err) {
       console.error("[authService] Erro ao limpar storage:", err);
     }
@@ -58,14 +63,14 @@ export const authService = {
   },
 
   /**
-   * Define token de acesso no localStorage
+   * Define token de acesso no sessionStorage
    */
   setAccessToken(token) {
     tokenStorage.setAccessToken(token);
   },
 
   /**
-   * Obtém token de acesso do localStorage
+   * Obtém token de acesso do sessionStorage
    */
   getAccessToken() {
     return tokenStorage.getAccessToken();
@@ -77,7 +82,7 @@ export const authService = {
   },
 
   isAuthenticated() {
-    return Boolean(memoryUser) || Boolean(tokenStorage.getAccessToken());
+    return Boolean(memoryUser);
   },
 
   /**
@@ -94,12 +99,14 @@ export const authService = {
       if (!user) {
         throw new Error("Usuário não autenticado ou resposta inválida");
       }
+      console.log("[authService] Usuário extraído:", user);
       memoryUser = user;
       console.log("[authService] Usuário definido na memória:", memoryUser);
       
       // Retorna user e token se disponível
-      return { user: memoryUser, token: response?.token ?? tokenStorage.getAccessToken() };
+      return { user: memoryUser, token: response?.token ?? null };
     } catch (err) {
+      // Se for apenas uma falha de autenticação comum (não logado), registrar apenas como informação
       const isExpectedAuthFailure = 
         err.message?.includes("Unauthorized") || 
         err.message?.includes("não autenticado") || 
@@ -115,59 +122,10 @@ export const authService = {
     }
   },
 
-  /**
-   * Envia o code obtido do Google para o backend a fim de obter o token de acesso
-   */
-  async loginWithGoogle(code) {
-    try {
-      console.log("[authService] Trocando code por access_token...");
-      const response = await apiRequest(
-        `${API_ROUTES.auth.googleCallback}?code=${encodeURIComponent(code)}`
-      );
-      console.log("[authService] Resposta de loginWithGoogle:", response);
-
-      const token =
-        response?.accessToken ??
-        response?.access_token ??
-        response?.token ??
-        response?.data?.accessToken ??
-        response?.data?.token ??
-        null;
-
-      if (!token) {
-        throw new Error("Token não retornado pelo backend após autenticação.");
-      }
-
-      tokenStorage.setAccessToken(token);
-
-      const user = response?.user ?? response?.data?.user ?? response?.data ?? null;
-      if (user) {
-        memoryUser = user;
-      }
-
-      return { user, token };
-    } catch (err) {
-      console.error("[authService] Erro em loginWithGoogle:", err);
-      throw err;
-    }
-  },
-
-  /**
-   * Obtém o perfil do usuário logado
-   */
-  async getProfile() {
-    try {
-      const result = await this.getCurrentUser();
-      return result.user;
-    } catch (err) {
-      console.error("[authService] Erro em getProfile:", err);
-      throw err;
-    }
-  },
-
   async login(email, password) {
     const response = await api.login({ email, password });
     if (response?.token) {
+      // Store token in sessionStorage instead of localStorage for security
       tokenStorage.setAccessToken(response.token);
     }
     memoryUser = response.user;
@@ -176,7 +134,7 @@ export const authService = {
 
   async logout() {
     try {
-      // Call backend logout endpoint
+      // Call backend logout endpoint to clear HttpOnly cookie
       const backendOrigin = import.meta.env.VITE_API_ORIGIN?.trim() || DEFAULT_API_ORIGIN;
       await fetch(`${backendOrigin}${API_ROUTES.auth.logout}`, {
         method: "POST",

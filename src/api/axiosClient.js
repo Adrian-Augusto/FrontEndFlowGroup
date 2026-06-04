@@ -11,9 +11,9 @@ export const AUTH_REFRESH_EVENT = "auth:refresh";
  */
 function getAccessToken() {
   try {
-    return localStorage.getItem("accessToken");
+    return sessionStorage.getItem("accessToken");
   } catch (err) {
-    console.error("[axiosClient] Erro ao recuperar token de localStorage:", err);
+    console.error("[axiosClient] Erro ao recuperar token de sessionStorage:", err);
     return null;
   }
 }

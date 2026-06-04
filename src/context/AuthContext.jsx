@@ -108,26 +108,23 @@ export function AuthProvider({ children }) {
 
       return true;
     } catch (err) {
-      throw new Error(err.message || "Erro ao aceitar termos.");
+      throw new Error(err.message || "Erro ao aceitar termos.", { cause: err });
     }
   }, [user, syncUser]);
 
-  const loginWithGoogle = useCallback(async (code) => {
+  const loginWithGoogle = useCallback(async () => {
     setProfileError(null);
     try {
-      const { user, token } = await authService.loginWithGoogle(code);
-      if (user) {
-        syncUser(user);
-      } else {
-        const profile = await authService.getProfile();
-        syncUser(profile);
-      }
-      return true;
+      // Este fluxo não é mais usado. O backend retorna token/cookie pronto.
+      // Esta função é mantida apenas para compatibilidade com código herdado.
+      // Novo fluxo: AuthCallbackPage chama refreshProfile() após OAuth
+      console.warn("[AuthContext] loginWithGoogle is deprecated - use refreshProfile instead");
+      return false;
     } catch (err) {
-      setProfileError(err?.message ?? "Erro na autenticação com Google.");
-      throw err;
+      setProfileError("Fluxo de autenticação alterado. Favor fazer login novamente.");
+      throw new Error("Autenticação com Google descontinuada", { cause: err });
     }
-  }, [syncUser]);
+  }, []);
 
   const value = useMemo(
     () => ({
