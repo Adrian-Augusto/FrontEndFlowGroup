@@ -66,16 +66,12 @@ export function AuthCallbackPage() {
           throw new Error("Perfil não encontrado após autenticação.");
         }
 
-        console.log("[AuthCallbackPage] ✓ Usuário autenticado com sucesso:", user.email || user.id);
-        console.log("[AuthCallbackPage] termos_aceitos (do perfil):", user.termos_aceitos, "termsAccepted:", user.termsAccepted);
 
         // ── 6. Verifica se usuário aceitou termos via API específica ─────────────────
         // Isso garante que o status seja consultado do backend (importante para usuários logando em outros PCs)
         let termsAccepted = user.termos_aceitos;
         try {
           const termsStatus = await termsApi.getStatus();
-          console.log("[AuthCallbackPage] Status dos termos via API:", termsStatus);
-          // Backend retorna termsAccepted
           termsAccepted = termsStatus?.termsAccepted ?? termsStatus?.accepted ?? user.termos_aceitos;
 
           // Atualiza usuário localmente com status correto dos termos
@@ -83,7 +79,6 @@ export function AuthCallbackPage() {
             const updatedUser = { ...user, termos_aceitos: termsAccepted };
             syncUser(updatedUser);
             authService.setUser(updatedUser);
-            console.log("[AuthCallbackPage] Usuário atualizado com termos_aceitos:", termsAccepted);
           }
         } catch (err) {
           console.warn("[AuthCallbackPage] Erro ao verificar status dos termos, usando valor do perfil:", err);
@@ -92,7 +87,6 @@ export function AuthCallbackPage() {
 
         // ── 7. Redireciona para termos se não aceitou ─────────────────
         if (!termsAccepted) {
-          console.log("[AuthCallbackPage] Usuário não aceitou termos, redirecionando para /termos");
           navigate("/termos", { replace: true });
           return;
         }
@@ -101,7 +95,7 @@ export function AuthCallbackPage() {
         navigate("/", { replace: true, state: { focusGrupos: true } });
 
       } catch (err) {
-        console.error("[AuthCallbackPage] ✗ Erro durante callback:", err.message);
+        console.error("[AuthCallbackPage] Erro durante callback:", err.message);
         
         // Debug: mostrar status do auth
         console.debug("[AuthCallbackPage] Debug info:", {

@@ -125,9 +125,9 @@ export const authService = {
         err.message?.includes("401");
 
       if (isExpectedAuthFailure) {
-        console.log("[authService] Nenhum usuário autenticado (sessão inexistente ou expirada).");
+        // Falha de autenticação esperada - não logar dados sensíveis
       } else {
-        console.error("[authService] Erro inesperado ao buscar usuário:", err);
+        console.error("[authService] Erro ao buscar usuário");
       }
       memoryUser = null;
       throw new Error("Usuário não autenticado ou resposta inválida", { cause: err });

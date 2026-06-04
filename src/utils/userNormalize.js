@@ -133,10 +133,8 @@ export function normalizeUser(data) {
   // Validate and sanitize avatar URL to prevent XSS
   avatarUrl = sanitizeAvatarUrl(avatarUrl);
 
-  console.log("[normalizeUser] Resolved avatarUrl:", avatarUrl);
-
   if (!id && !email && !name) {
-    console.error("[normalizeUser] No valid id, email or name found in:", rawUser);
+    console.error("[normalizeUser] No valid id, email or name found");
     return null;
   }
 

@@ -96,42 +96,30 @@ export function PlansPage() {
   };
 
   useEffect(() => {
-    console.log("[PlansPage] FALLBACK_PLANS:", FALLBACK_PLANS);
     (async () => {
       try {
         const response = await plansApi.listPlans();
-        console.log("[PlansPage] Raw response from API:", response);
         let plansData = [];
 
         if (Array.isArray(response)) {
           plansData = response;
-          console.log("[PlansPage] Response is an array, using directly");
         } else if (response?.data && Array.isArray(response.data)) {
           plansData = response.data;
-          console.log("[PlansPage] Response has data array, using response.data");
         } else if (response?.plans && Array.isArray(response.plans)) {
           plansData = response.plans;
-          console.log("[PlansPage] Response has plans array, using response.plans");
         } else {
           plansData = FALLBACK_PLANS;
-          console.log("[PlansPage] No valid array found, using fallback plans");
         }
 
-        console.log("[PlansPage] plansData:", plansData);
-        console.log("[PlansPage] plansData.length:", plansData?.length);
         const fallbackIds = ["test", "three-days", "seven-days", "fifteen-days", "monthly"];
         const isBackendResponse = plansData?.length && plansData[0].id && !fallbackIds.includes(plansData[0].id);
-        console.log("[PlansPage] isBackendResponse:", isBackendResponse);
         const normalized = isBackendResponse ? normalizePlans(plansData) : plansData;
         const basePlans = normalized?.length ? normalized : FALLBACK_PLANS;
-
-        console.log("[PlansPage] basePlans:", basePlans);
-        console.log("[PlansPage] basePlans.length:", basePlans?.length);
 
         // Always show all plans
         setPlans(basePlans);
       } catch (err) {
-        console.error("[PlansPage] Erro:", err);
+        console.error("[PlansPage] Erro ao carregar planos:", err);
         setPlans(FALLBACK_PLANS);
       } finally {
         setLoading(false);

@@ -98,7 +98,6 @@ export function AuthProvider({ children }) {
   );
 
   const logout = useCallback(async () => {
-    console.log("[AuthContext] User-initiated logout");
     await authService.logout();
     setUser(null);
     setProfileError(null);
