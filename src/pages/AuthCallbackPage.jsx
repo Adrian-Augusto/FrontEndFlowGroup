@@ -75,8 +75,9 @@ export function AuthCallbackPage() {
         try {
           const termsStatus = await termsApi.getStatus();
           console.log("[AuthCallbackPage] Status dos termos via API:", termsStatus);
-          termsAccepted = termsStatus?.accepted ?? user.termos_aceitos;
-          
+          // Backend retorna termsAccepted
+          termsAccepted = termsStatus?.termsAccepted ?? termsStatus?.accepted ?? user.termos_aceitos;
+
           // Atualiza usuário localmente com status correto dos termos
           if (termsAccepted !== user.termos_aceitos) {
             const updatedUser = { ...user, termos_aceitos: termsAccepted };

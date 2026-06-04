@@ -29,35 +29,22 @@ export const termsApi = {
   /** GET /api/v1/terms/status - Verificar se usuário aceitou os termos (requer auth) */
   async getStatus() {
     const data = await request("/api/v1/terms/status");
-    
+
     console.log("[termsApi] Response BRUTO do backend:", JSON.stringify(data, null, 2));
     console.log("[termsApi] Todas as chaves:", Object.keys(data || {}));
-    
-    // Mapear diferentes formatos possíveis do backend
-    let isAccepted = false;
-    
-    // Formato 1: { accepted: true/false }
-    if (data?.accepted !== undefined) {
-      isAccepted = data.accepted === true;
-      console.log("[termsApi] Formato 1 (accepted boolean):", isAccepted);
-    }
-    // Formato 2: { status: "approved" ou "rejected" }
-    else if (data?.status) {
-      isAccepted = data.status === "approved" || data.status === "accepted";
-      console.log("[termsApi] Formato 2 (status string):", isAccepted, `(status=${data.status})`);
-    }
-    // Formato 3: { termsAccepted: true/false }
-    else if (data?.termsAccepted !== undefined) {
-      isAccepted = data.termsAccepted === true;
-      console.log("[termsApi] Formato 3 (termsAccepted boolean):", isAccepted);
-    }
-    
-    console.log("[termsApi] Final accepted:", isAccepted);
-    
+
+    // Backend retorna: { termsAccepted: true/false, userVersion: 0, currentVersion: 1, needsUpdate: true/false }
+    const termsAccepted = data?.termsAccepted === true;
+    const needsUpdate = data?.needsUpdate === true;
+
+    console.log("[termsApi] termsAccepted:", termsAccepted, "needsUpdate:", needsUpdate);
+
     return {
-      accepted: isAccepted,
-      acceptedVersion: data?.acceptedVersion ?? null,
-      acceptedAt: data?.acceptedAt ?? null,
+      accepted: termsAccepted,
+      termsAccepted: termsAccepted,
+      userVersion: data?.userVersion ?? 0,
+      currentVersion: data?.currentVersion ?? 1,
+      needsUpdate: needsUpdate,
       rawData: data, // para debug
     };
   },
