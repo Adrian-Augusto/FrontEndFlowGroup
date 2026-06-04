@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { authService } from "../auth/authService";
+import { termsApi } from "../api/termsApi";
 import { escapeHtml } from "../utils/securityValidators";
 import "./AuthCallbackPage.css";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
-  const { refreshProfile } = useAuth();
+  const { refreshProfile, syncUser } = useAuth();
   const [status, setStatus] = useState("loading"); // "loading" | "error"
   const [errorMsg, setErrorMsg] = useState("");
   const handled = useRef(false);
@@ -66,17 +67,36 @@ export function AuthCallbackPage() {
         }
 
         console.log("[AuthCallbackPage] ✓ Usuário autenticado com sucesso:", user.email || user.id);
-        console.log("[AuthCallbackPage] termos_aceitos:", user.termos_aceitos, "termsAccepted:", user.termsAccepted);
+        console.log("[AuthCallbackPage] termos_aceitos (do perfil):", user.termos_aceitos, "termsAccepted:", user.termsAccepted);
 
-        // ── 6. Verifica se usuário aceitou termos ─────────────────
-        // Só redireciona para termos se backend indicar que não aceitou
-        if (!user.termos_aceitos) {
+        // ── 6. Verifica se usuário aceitou termos via API específica ─────────────────
+        // Isso garante que o status seja consultado do backend (importante para usuários logando em outros PCs)
+        let termsAccepted = user.termos_aceitos;
+        try {
+          const termsStatus = await termsApi.getStatus();
+          console.log("[AuthCallbackPage] Status dos termos via API:", termsStatus);
+          termsAccepted = termsStatus?.accepted ?? user.termos_aceitos;
+          
+          // Atualiza usuário localmente com status correto dos termos
+          if (termsAccepted !== user.termos_aceitos) {
+            const updatedUser = { ...user, termos_aceitos: termsAccepted };
+            syncUser(updatedUser);
+            authService.setUser(updatedUser);
+            console.log("[AuthCallbackPage] Usuário atualizado com termos_aceitos:", termsAccepted);
+          }
+        } catch (err) {
+          console.warn("[AuthCallbackPage] Erro ao verificar status dos termos, usando valor do perfil:", err);
+          termsAccepted = user.termos_aceitos;
+        }
+
+        // ── 7. Redireciona para termos se não aceitou ─────────────────
+        if (!termsAccepted) {
           console.log("[AuthCallbackPage] Usuário não aceitou termos, redirecionando para /termos");
           navigate("/termos", { replace: true });
           return;
         }
 
-        // ── 7. Redireciona para home ─────────────────────────────
+        // ── 8. Redireciona para home ─────────────────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
 
       } catch (err) {

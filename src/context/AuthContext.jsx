@@ -106,20 +106,20 @@ export function AuthProvider({ children }) {
 
   const acceptTerms = useCallback(async () => {
     try {
-      await termsApi.acceptTerms();
+      const updatedUser = await termsApi.acceptTerms();
 
-      // Atualizar usuário localmente com termos aceitos (otimização)
-      const updatedUser = { ...user, termos_aceitos: true };
-      syncUser(updatedUser);
-
-      // Também atualiza authService.memoryUser para consistência
-      authService.setUser(updatedUser);
+      // Backend retorna usuário atualizado com termos_aceitos: true
+      // Atualiza estado local com dados do backend
+      if (updatedUser) {
+        syncUser(updatedUser);
+        authService.setUser(updatedUser);
+      }
 
       return true;
     } catch (err) {
       throw new Error(err.message || "Erro ao aceitar termos.", { cause: err });
     }
-  }, [user, syncUser]);
+  }, [syncUser]);
 
   const loginWithGoogle = useCallback(async () => {
     setProfileError(null);

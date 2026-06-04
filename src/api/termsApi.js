@@ -71,7 +71,10 @@ export const termsApi = {
         data: { accepted: true },
       });
       console.log("[termsApi] ✅ Response do POST:", response);
-      return response;
+      // Backend retorna { message: '...', user: {...} }
+      // Extrair usuário da resposta para atualizar estado local
+      const updatedUser = response?.user || response?.data?.user || response;
+      return updatedUser;
     } catch (err) {
       console.error("[termsApi] ❌ Erro no POST:", err);
       throw err;
