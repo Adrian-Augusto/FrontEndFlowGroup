@@ -29,10 +29,7 @@ export function AuthCallbackPage() {
 
       // ── 1.5. Se backend enviou token na query, armazena em sessionStorage ─
       if (tokenParam) {
-        console.log("[AuthCallbackPage] ✓ Token recebido via ?token= query param");
         authService.setAccessToken(tokenParam);
-      } else {
-        console.log("[AuthCallbackPage] Token será enviado via HttpOnly cookie + withCredentials");
       }
 
       // ── 2. Limpa a URL imediatamente (segurança) ─────────────────
@@ -70,7 +67,15 @@ export function AuthCallbackPage() {
 
         console.log("[AuthCallbackPage] ✓ Usuário autenticado com sucesso:", user.email || user.id);
 
-        // ── 6. Redireciona para home ─────────────────────────────
+        // ── 6. Verifica se usuário aceitou termos ─────────────────
+        // Só redireciona para termos se backend indicar que não aceitou
+        if (!user.termos_aceitos) {
+          console.log("[AuthCallbackPage] Usuário não aceitou termos, redirecionando para /termos");
+          navigate("/termos", { replace: true });
+          return;
+        }
+
+        // ── 7. Redireciona para home ─────────────────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
 
       } catch (err) {
@@ -78,7 +83,6 @@ export function AuthCallbackPage() {
         
         // Debug: mostrar status do auth
         console.debug("[AuthCallbackPage] Debug info:", {
-          token: authService.getAccessToken() ? "presente" : "ausente",
           cookies: document.cookie ? document.cookie.substring(0, 50) : "nenhum",
         });
 

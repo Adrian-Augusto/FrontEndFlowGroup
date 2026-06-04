@@ -20,7 +20,7 @@ const tokenStorage = {
     try {
       sessionStorage.setItem("accessToken", token);
     } catch (err) {
-      console.error("[authService] Erro ao salvar token:", err);
+      console.error("[authService] Erro ao salvar credenciais:", err);
     }
   },
 
@@ -28,7 +28,7 @@ const tokenStorage = {
     try {
       return sessionStorage.getItem("accessToken");
     } catch (err) {
-      console.error("[authService] Erro ao recuperar token:", err);
+      console.error("[authService] Erro ao recuperar credenciais:", err);
       return null;
     }
   },
@@ -37,7 +37,7 @@ const tokenStorage = {
     try {
       sessionStorage.removeItem("accessToken");
     } catch (err) {
-      console.error("[authService] Erro ao remover token:", err);
+      console.error("[authService] Erro ao remover credenciais:", err);
     }
   },
 
@@ -93,7 +93,6 @@ export const authService = {
     try {
       console.log("[authService] Buscando perfil do usuário...");
       const response = await api.getGoogleProfile();
-      console.log("[authService] Resposta do perfil:", response);
       // getGoogleProfile retorna { data: user, raw: response, token? }
       const user = response?.data;
       if (!user) {
@@ -116,7 +115,7 @@ export const authService = {
         termos_aceitos: memoryUser.termos_aceitos,
         termsAccepted: memoryUser.termsAccepted,
       });
-      
+
       return memoryUser;
     } catch (err) {
       // Se for apenas uma falha de autenticação comum (não logado), registrar apenas como informação

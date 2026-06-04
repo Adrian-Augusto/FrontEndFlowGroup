@@ -4,17 +4,19 @@ import { useAuth } from "../context/AuthContext";
 
 /**
  * ProtectedRoute component
- * 
+ *
  * Protects routes by requiring authentication and optionally admin role.
  * Features:
  * - Validates user is authenticated via AuthContext
  * - Checks authService state for consistency
  * - Requires admin role if specified
- * - Checks if user accepted terms
  * - Preserves intended path for redirect after login
  * - Shows loading state while checking authentication
+ *
+ * Note: Terms acceptance is NOT checked here - terms should only be shown
+ * after login if backend indicates user hasn't accepted them yet.
  */
-export function ProtectedRoute({ children, requireAdmin = false, requireTerms = true }) {
+export function ProtectedRoute({ children, requireAdmin = false }) {
   const { loading, isAdmin, user } = useAuth();
   const location = useLocation();
 
@@ -32,12 +34,6 @@ export function ProtectedRoute({ children, requireAdmin = false, requireTerms = 
   if (!authService.isAuthenticated() || !user) {
     console.warn("[ProtectedRoute] User not authenticated, redirecting to login");
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
-  }
-
-  // User authenticated but terms not accepted - redirect to terms page
-  if (requireTerms && !user.termos_aceitos && location.pathname !== "/termos") {
-    console.warn("[ProtectedRoute] User has not accepted terms, redirecting to /termos");
-    return <Navigate to="/termos" state={{ from: location.pathname }} replace />;
   }
 
   // User authenticated but admin required - redirect to home

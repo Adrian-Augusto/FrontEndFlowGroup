@@ -13,7 +13,7 @@ function getAccessToken() {
   try {
     return sessionStorage.getItem("accessToken");
   } catch (err) {
-    console.error("[axiosClient] Erro ao recuperar token de sessionStorage:", err);
+    console.error("[axiosClient] Erro ao recuperar credenciais:", err);
     return null;
   }
 }
