@@ -1,15 +1,67 @@
 .login-success {
-  flex: 1;
-  display: grid;
-  place-items: center;
-  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #0f0f13;
+}
+
+/* ── Loading ─────────────────────────────────────────────────── */
+.login-success__loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.login-success__spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .login-success__loading {
-  color: var(--color-text-muted);
-  font-weight: 500;
+  color: #a1a1aa;
+  font-size: 1rem;
+  font-family: "Inter", sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* ── Error ───────────────────────────────────────────────────── */
+.login-success__error-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  max-width: 360px;
+  text-align: center;
+}
+
+.login-success__error-icon {
+  font-size: 2rem;
 }
 
 .login-success__error {
-  color: #b91c1c;
+  color: #f87171;
+  font-size: 0.95rem;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+}
+
+.login-success__redirect-msg {
+  color: #71717a;
+  font-size: 0.8rem;
+  font-family: "Inter", sans-serif;
+  margin: 0;
 }

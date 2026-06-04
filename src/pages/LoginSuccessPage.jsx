@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { termsApi } from "../api/termsApi";
 import "./LoginSuccessPage.css";
 
 export function LoginSuccessPage() {
   const navigate = useNavigate();
   const { refreshProfile } = useAuth();
-  const [error, setError] = useState("");
+  const [status, setStatus] = useState("loading"); // "loading" | "error"
+  const [errorMsg, setErrorMsg] = useState("");
   const handled = useRef(false);
 
   useEffect(() => {
@@ -15,83 +15,91 @@ export function LoginSuccessPage() {
     handled.current = true;
 
     (async () => {
+      // ── 1. Captura do token ──────────────────────────────────────
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token") || params.get("accessToken");
+
+      // ── 2. Remove da URL IMEDIATAMENTE (antes de qualquer await) ──
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      // ── 3. Validação inicial ──────────────────────────────────────
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      // Validação básica do formato JWT (3 partes separadas por ponto)
+      const parts = token.split(".");
+      if (parts.length !== 3) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      // Verificar expiração do token
       try {
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get("token") || params.get("accessToken");
-
-        // ⚠️ Remove token da URL IMEDIATAMENTE — nunca deve ficar visível
-        if (params.has("token") || params.has("accessToken")) {
-          window.history.replaceState({}, document.title, window.location.pathname);
+        const payload = JSON.parse(atob(parts[1]));
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp < now) {
+          navigate("/login", { replace: true });
+          return;
         }
+      } catch {
+        navigate("/login", { replace: true });
+        return;
+      }
 
-        if (token) {
-          localStorage.setItem("accessToken", token);
-        }
+      try {
+        // ── 4. Armazena o token ───────────────────────────────────
+        localStorage.setItem("accessToken", token);
 
-        // 1. Refresh profile
-        console.log("[LoginSuccessPage] Buscando perfil do usuário...");
+        // ── 5. Busca perfil autenticado ───────────────────────────
         const user = await refreshProfile();
-        console.log("[LoginSuccessPage] Perfil obtido:", user);
 
         if (!user) {
-          throw new Error("Não foi possível obter perfil do usuário");
+          throw new Error("Perfil não encontrado após autenticação.");
         }
 
-        // 2. Verificar se termos foram aceitos
-        console.log("[LoginSuccessPage] Verificando status dos termos...");
-        try {
-          if (user.termos_aceitos === true) {
-            console.log("[LoginSuccessPage] ✅ Termos já foram aceitos (no perfil do usuário)! Redirecionando para home");
-            navigate("/", { replace: true, state: { focusGrupos: true } });
-            return;
-          }
-
-          const termsStatus = await termsApi.getStatus();
-          console.log("[LoginSuccessPage] ===== STATUS RETORNADO =====");
-          console.log("[LoginSuccessPage] Resposta bruta:", termsStatus?.rawData);
-          console.log("[LoginSuccessPage] accepted (final):", termsStatus?.accepted);
-          console.log("[LoginSuccessPage] Tipo de accepted:", typeof termsStatus?.accepted);
-          console.log("[LoginSuccessPage] ============================");
-
-          // Se termos foram aceitos, vai para home
-          if (termsStatus?.accepted === true) {
-            console.log("[LoginSuccessPage] ✅ Termos já foram aceitos! Redirecionando para home");
-            navigate("/", { replace: true, state: { focusGrupos: true } });
-            return;
-          } else {
-            console.log("[LoginSuccessPage] ❌ Termos NÃO foram aceitos, redirecionando para /termos");
-            navigate("/termos", { replace: true });
-            return;
-          }
-        } catch (err) {
-          // Se falhar ao verificar, continua (fallback)
-          console.warn("[LoginSuccessPage] Erro ao verificar termos:", err);
-        }
-
-        // 3. Termos ok - redirecionar para home
-        console.log("[LoginSuccessPage] Tudo certo, redirecionando para home");
+        // ── 6. Redireciona para área autenticada ──────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
+
       } catch (err) {
-        console.error("[LoginSuccessPage] Erro:", err);
-        setError("Não foi possível iniciar a sessão.");
-        setTimeout(() => navigate("/login", { replace: true }), 2000);
+        // ── 7. Tratamento de erro ─────────────────────────────────
+        console.error("[LoginSuccessPage] Erro ao processar autenticação:", err);
+
+        // Limpa dados inválidos
+        localStorage.removeItem("accessToken");
+
+        setStatus("error");
+        setErrorMsg("Não foi possível autenticar. Tente novamente.");
+
+        setTimeout(() => {
+          navigate("/login", { replace: true });
+        }, 2500);
       }
     })();
   }, [navigate, refreshProfile]);
 
-  if (error) {
+  // ── UI ─────────────────────────────────────────────────────────────
+  if (status === "error") {
     return (
       <div className="login-success">
-        <p className="login-success__error">{error}</p>
+        <div className="login-success__error-box">
+          <span className="login-success__error-icon">⚠️</span>
+          <p className="login-success__error">{errorMsg}</p>
+          <p className="login-success__redirect-msg">Redirecionando para o login…</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="login-success">
-      <p className="login-success__loading" role="status">
-        Entrando…
-      </p>
+      <div className="login-success__loading-box">
+        <div className="login-success__spinner" aria-hidden="true" />
+        <p className="login-success__loading" role="status" aria-live="polite">
+          Autenticando…
+        </p>
+      </div>
     </div>
   );
 }
