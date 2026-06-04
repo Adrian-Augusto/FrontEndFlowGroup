@@ -6,7 +6,7 @@ import "./AuthCallbackPage.css";
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
-  const { refreshProfile } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const [status, setStatus] = useState("loading"); // "loading" | "error"
   const handled = useRef(false);
 
@@ -17,8 +17,8 @@ export function AuthCallbackPage() {
     (async () => {
       // ── 1. Captura params ANTES de limpar a URL ──────────────────
       const params = new URLSearchParams(window.location.search);
-      const codeParam = params.get("code");
       const errorParam = params.get("error");
+      const code = params.get("code");
 
       // ── 2. Limpa a URL imediatamente (segurança) ─────────────────
       window.history.replaceState(
@@ -38,66 +38,26 @@ export function AuthCallbackPage() {
         return;
       }
 
-      if (!codeParam) {
-        console.warn("[AuthCallbackPage] Código de autorização ausente.");
-        navigate("/login?error=auth_failed", { replace: true });
-        return;
-      }
-
       try {
-        // ── 4. Troca o código temporário pelo token JWT ─────────────
-        const apiOrigin = import.meta.env.VITE_API_ORIGIN?.trim() || "https://allgrops.onrender.com";
-        const EXCHANGE_URL = `${apiOrigin.replace(/\/$/, "")}/api/v1/auth/exchange-code`;
-
-        console.log("[AuthCallbackPage] Trocando código temporário...");
-        const res = await fetch(EXCHANGE_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({ code: codeParam }),
-        });
-
-        if (!res.ok) {
-          console.warn("[AuthCallbackPage] Falha na troca do código:", res.status);
-          navigate("/login?error=auth_failed", { replace: true });
-          return;
+        if (!code) {
+          throw new Error("Código de autenticação (code) ausente na URL.");
         }
 
-        // Extrai o JSON e obtém o token retornado pelo backend
-        const data = await res.json();
-        const token = data?.accessToken ?? data?.token;
-        if (!token) {
-          throw new Error("Token não retornado pelo servidor.");
-        }
+        console.log("[AuthCallbackPage] Validando código de autenticação do Google...");
+        
+        // Chamada ao AuthContext para enviar o code ao backend e sincronizar dados
+        await loginWithGoogle(code);
 
-        console.log("[AuthCallbackPage] Token recebido com sucesso.");
-        const { authService } = await import("../auth/authService");
-        authService.setAccessToken(token);
+        console.log("[AuthCallbackPage] ✓ Usuário autenticado e sincronizado com sucesso.");
 
-        // ── 5. Salva usuário no estado da aplicação ───────────────
-        // refreshProfile busca /auth/google/profile novamente via Axios
-        // e sincroniza o AuthContext (setUser, memoryUser, etc.)
-        const user = await refreshProfile();
-
-        if (!user) {
-          throw new Error("Perfil não encontrado após autenticação.");
-        }
-
-        console.log(
-          "[AuthCallbackPage] ✓ Usuário autenticado com sucesso:",
-          user
-        );
-
-        // ── 6. Redireciona para home ──────────────────────────────
+        // ── 4. Redireciona para home ──────────────────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
       } catch (err) {
         console.error("[AuthCallbackPage] Erro durante callback:", err);
         navigate("/login?error=auth_failed", { replace: true });
       }
     })();
-  }, [navigate, refreshProfile]);
+  }, [navigate, loginWithGoogle]);
 
   // ── UI: spinner enquanto valida ─────────────────────────────────────
   if (status === "error") {

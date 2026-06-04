@@ -112,6 +112,23 @@ export function AuthProvider({ children }) {
     }
   }, [user, syncUser]);
 
+  const loginWithGoogle = useCallback(async (code) => {
+    setProfileError(null);
+    try {
+      const { user, token } = await authService.loginWithGoogle(code);
+      if (user) {
+        syncUser(user);
+      } else {
+        const profile = await authService.getProfile();
+        syncUser(profile);
+      }
+      return true;
+    } catch (err) {
+      setProfileError(err?.message ?? "Erro na autenticação com Google.");
+      throw err;
+    }
+  }, [syncUser]);
+
   const value = useMemo(
     () => ({
       user,
@@ -120,6 +137,7 @@ export function AuthProvider({ children }) {
       isAuthenticated: authService.isAuthenticated(),
       isAdmin: user?.role?.toUpperCase() === "ADMIN",
       refreshProfile,
+      loginWithGoogle,
       startGoogleLogin,
       loginWithCredentials,
       logout,
@@ -130,6 +148,7 @@ export function AuthProvider({ children }) {
       loading,
       profileError,
       refreshProfile,
+      loginWithGoogle,
       startGoogleLogin,
       loginWithCredentials,
       logout,
