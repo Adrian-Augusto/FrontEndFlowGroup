@@ -21,7 +21,7 @@ export const API_ROUTES = {
     login: apiPath("auth", "login"),
     google: apiPath("auth", "google"),
     googleCallback: apiPath("auth", "google", "callback"),
-    googleProfile: apiPath("users", "me"),
+    googleProfile: apiPath("auth", "google", "profile"),
     logout: apiPath("auth", "logout"),
   },
   groups: {
