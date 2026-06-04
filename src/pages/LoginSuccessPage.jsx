@@ -15,59 +15,23 @@ export function LoginSuccessPage() {
     handled.current = true;
 
     (async () => {
-      // ── 1. Captura do token ──────────────────────────────────────
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token") || params.get("accessToken");
-
-      // ── 2. Remove da URL IMEDIATAMENTE (antes de qualquer await) ──
+      // ── 1. Remove qualquer token da URL IMEDIATAMENTE (segurança) ──
       window.history.replaceState({}, document.title, window.location.pathname);
 
-      // ── 3. Validação inicial ──────────────────────────────────────
-      if (!token) {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      // Validação básica do formato JWT (3 partes separadas por ponto)
-      const parts = token.split(".");
-      if (parts.length !== 3) {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      // Verificar expiração do token
       try {
-        const payload = JSON.parse(atob(parts[1]));
-        const now = Math.floor(Date.now() / 1000);
-        if (payload.exp && payload.exp < now) {
-          navigate("/login", { replace: true });
-          return;
-        }
-      } catch {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      try {
-        // ── 4. Armazena o token ───────────────────────────────────
-        localStorage.setItem("accessToken", token);
-
-        // ── 5. Busca perfil autenticado ───────────────────────────
+        // ── 2. Busca perfil usando cookie HttpOnly (NÃO token da URL) ──
         const user = await refreshProfile();
 
         if (!user) {
           throw new Error("Perfil não encontrado após autenticação.");
         }
 
-        // ── 6. Redireciona para área autenticada ──────────────────
+        // ── 3. Redireciona para área autenticada ──────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
 
       } catch (err) {
-        // ── 7. Tratamento de erro ─────────────────────────────────
+        // ── 4. Tratamento de erro ─────────────────────────────────
         console.error("[LoginSuccessPage] Erro ao processar autenticação:", err);
-
-        // Limpa dados inválidos
-        localStorage.removeItem("accessToken");
 
         setStatus("error");
         setErrorMsg("Não foi possível autenticar. Tente novamente.");
