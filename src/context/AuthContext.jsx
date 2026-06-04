@@ -53,8 +53,10 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, [refreshProfile]);
 
+  // Listen for logout events (triggered by 401/403 responses from API)
   useEffect(() => {
     const onLogout = () => {
+      console.log("[AuthContext] Logout event received - clearing session");
       authService.clearSession();
       setUser(null);
       setProfileError(null);
@@ -64,7 +66,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const startGoogleLogin = useCallback((returnPath = "/") => {
-    window.location.href = getGoogleLoginUrl(returnPath);
+    const loginUrl = getGoogleLoginUrl(returnPath);
+    console.log("[AuthContext] Starting Google OAuth flow");
+    window.location.href = loginUrl;
   }, []);
 
   const loginWithCredentials = useCallback(
@@ -84,6 +88,7 @@ export function AuthProvider({ children }) {
   );
 
   const logout = useCallback(async () => {
+    console.log("[AuthContext] User-initiated logout");
     await authService.logout();
     setUser(null);
     setProfileError(null);

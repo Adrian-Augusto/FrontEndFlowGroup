@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { GoogleSignInButton } from "../components/GoogleSignInButton";
 import { OctopusIllustration } from "../components/OctopusIllustration";
+import { isSafeRedirectUrl } from "../utils/securityValidators";
 import "./LoginPage.css";
 
 export function LoginPage() {
@@ -11,7 +12,15 @@ export function LoginPage() {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
 
-  const from = location.state?.from ?? "/";
+  // Validate and sanitize the 'from' parameter to prevent open redirects
+  const from = (() => {
+    const fromPath = location.state?.from;
+    if (isSafeRedirectUrl(fromPath)) {
+      return fromPath;
+    }
+    // Default to home if 'from' is invalid
+    return "/";
+  })();
 
   useEffect(() => {
     if (isAuthenticated) navigate(from, { replace: true });

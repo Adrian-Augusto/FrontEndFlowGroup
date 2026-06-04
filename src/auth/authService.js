@@ -5,6 +5,51 @@ import { DEFAULT_API_ORIGIN } from "../api/routes";
 /** @type {object | null} */
 let memoryUser = null;
 
+/**
+ * Token storage utilities - uses sessionStorage for XSS protection
+ * sessionStorage is cleared when the browser tab closes
+ */
+const tokenStorage = {
+  /**
+   * Store access token in sessionStorage (not localStorage)
+   * sessionStorage is not accessible from other tabs/windows
+   * and is cleared on browser close
+   */
+  setAccessToken(token) {
+    if (!token || typeof token !== "string") return;
+    try {
+      sessionStorage.setItem("accessToken", token);
+    } catch (err) {
+      console.error("[authService] Erro ao salvar token:", err);
+    }
+  },
+
+  getAccessToken() {
+    try {
+      return sessionStorage.getItem("accessToken");
+    } catch (err) {
+      console.error("[authService] Erro ao recuperar token:", err);
+      return null;
+    }
+  },
+
+  removeAccessToken() {
+    try {
+      sessionStorage.removeItem("accessToken");
+    } catch (err) {
+      console.error("[authService] Erro ao remover token:", err);
+    }
+  },
+
+  clear() {
+    try {
+      sessionStorage.removeItem("accessToken");
+    } catch (err) {
+      console.error("[authService] Erro ao limpar storage:", err);
+    }
+  },
+};
+
 export const authService = {
   /**
    * Define usuário na memória (após login)
@@ -19,6 +64,7 @@ export const authService = {
 
   clearSession() {
     memoryUser = null;
+    tokenStorage.clear();
   },
 
   isAuthenticated() {
@@ -62,7 +108,8 @@ export const authService = {
   async login(email, password) {
     const response = await api.login({ email, password });
     if (response?.token) {
-      localStorage.setItem("accessToken", response.token);
+      // Store token in sessionStorage instead of localStorage for security
+      tokenStorage.setAccessToken(response.token);
     }
     memoryUser = response.user;
     return response.user;
@@ -79,8 +126,13 @@ export const authService = {
     } catch (err) {
       console.error("[authService] Erro ao fazer logout no backend:", err);
     } finally {
-      localStorage.removeItem("accessToken");
+      tokenStorage.removeAccessToken();
       memoryUser = null;
     }
   },
 };
+
+/**
+ * Export token storage for use in axiosClient
+ */
+export { tokenStorage };

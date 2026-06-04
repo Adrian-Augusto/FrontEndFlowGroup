@@ -1,4 +1,56 @@
 /**
+ * Validates and sanitizes avatar URLs to prevent XSS attacks
+ * Only allows:
+ * - Relative paths starting with /uploads/
+ * - HTTPS URLs from trusted domains (google, gravatar, etc)
+ * - Data URIs for fallback images
+ */
+function sanitizeAvatarUrl(url) {
+  if (!url || typeof url !== "string") return null;
+
+  const trimmed = url.trim();
+
+  // Allow relative paths for uploaded images
+  if (trimmed.startsWith("/uploads/")) {
+    // Ensure no path traversal attempts
+    if (trimmed.includes("..")) return null;
+    return trimmed;
+  }
+
+  // Allow HTTPS URLs from known safe domains
+  try {
+    const urlObj = new URL(trimmed);
+    
+    // Must be HTTPS
+    if (urlObj.protocol !== "https:") return null;
+
+    // Whitelist of trusted domains for avatars
+    const trustedDomains = [
+      "lh3.googleusercontent.com", // Google avatars
+      "lh4.googleusercontent.com",
+      "lh5.googleusercontent.com",
+      "lh6.googleusercontent.com",
+      "avatars.githubusercontent.com", // GitHub
+      "www.gravatar.com", // Gravatar
+      "gravatar.com",
+    ];
+
+    const hostname = urlObj.hostname.toLowerCase();
+    const isTrusted = trustedDomains.some(domain => hostname === domain || hostname.endsWith(`.${domain}`));
+    
+    if (isTrusted) {
+      return trimmed;
+    }
+  } catch (err) {
+    // Invalid URL format
+    console.warn("[sanitizeAvatarUrl] Invalid URL format:", err.message);
+  }
+
+  // Reject anything else
+  return null;
+}
+
+/**
  * Normaliza o usuário do backend Nest para o formato do frontend.
  * Backend: { googleId, email, name, profileImage, role? }
  */
@@ -55,9 +107,10 @@ export function normalizeUser(data) {
     rawUser.imageUrl ??
     null;
 
+  // Try to recover avatar from sessionStorage (uses sessionStorage for security)
   if (!avatarUrl) {
     try {
-      const stored = localStorage.getItem("userAvatar");
+      const stored = sessionStorage.getItem("userAvatar");
       if (stored) {
         if (stored.startsWith("{")) {
           const parsed = JSON.parse(stored);
@@ -67,14 +120,18 @@ export function normalizeUser(data) {
         }
       }
     } catch (e) {
-      // ignore
+      // Ignore parsing errors
     }
   }
 
+  // Normalize /uploads paths
   if (avatarUrl && typeof avatarUrl === "string" && avatarUrl.includes("/uploads/")) {
     const parts = avatarUrl.split("/uploads/");
     avatarUrl = "/uploads/" + parts[parts.length - 1];
   }
+
+  // Validate and sanitize avatar URL to prevent XSS
+  avatarUrl = sanitizeAvatarUrl(avatarUrl);
 
   console.log("[normalizeUser] Resolved avatarUrl:", avatarUrl);
 
@@ -103,7 +160,7 @@ export function normalizeUser(data) {
     googleId: rawUser.googleId ?? null,
     name: name || null,
     email: email || null,
-    avatarUrl: typeof avatarUrl === "string" ? avatarUrl : null,
+    avatarUrl: avatarUrl || null,
     role: normalizedRole,
     termos_aceitos: rawUser.termsAccepted ?? rawUser.termos_aceitos ?? false,
   };

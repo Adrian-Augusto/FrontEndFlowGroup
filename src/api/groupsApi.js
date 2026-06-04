@@ -80,8 +80,9 @@ export const groupsApi = {
     if (!USE_MOCK) {
       // Check if user is authenticated
       const user = authService.getUser();
-      const token = localStorage.getItem("accessToken");
-      console.log("User auth check:", { user: user?.id, hasToken: !!token });
+      if (!user) {
+        throw new Error("Usuário não autenticado");
+      }
 
       // Upload photo using multipart/form-data
       let photoUrl = DEFAULT_PHOTO;

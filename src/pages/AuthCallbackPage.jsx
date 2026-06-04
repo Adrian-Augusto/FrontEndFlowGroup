@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { escapeHtml } from "../utils/securityValidators";
 import "./AuthCallbackPage.css";
 
 export function AuthCallbackPage() {
@@ -28,7 +29,10 @@ export function AuthCallbackPage() {
 
       // ── 3. Verifica erro vindo do backend ────────────────────────
       if (errorParam) {
-        navigate(`/login?error=${encodeURIComponent(errorParam)}`, {
+        // Sanitize error message to prevent XSS in URL
+        const sanitizedError = escapeHtml(errorParam).substring(0, 100);
+        console.warn("[AuthCallbackPage] OAuth error:", sanitizedError);
+        navigate(`/login?error=${encodeURIComponent(sanitizedError)}`, {
           replace: true,
         });
         return;

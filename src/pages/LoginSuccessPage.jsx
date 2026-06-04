@@ -15,38 +15,29 @@ export function LoginSuccessPage() {
     handled.current = true;
 
     (async () => {
-      // ── 1. Captura o token ANTES de limpar a URL ─────────────────
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token");
-
-      // ── 2. Limpa a URL imediatamente (segurança) ──────────────────
+      // ── 1. Remove qualquer token da URL IMEDIATAMENTE (segurança) ──
       window.history.replaceState({}, document.title, window.location.pathname);
 
-      // ── 3. Valida token ───────────────────────────────────────────
-      if (!token) {
-        navigate("/login?error=missing_token", { replace: true });
-        return;
-      }
-
-      // ── 4. Salva token no localStorage ────────────────────────────
-      localStorage.setItem("accessToken", token);
-
       try {
-        // ── 5. Busca perfil (agora o interceptor já tem o Bearer) ───
+        // ── 2. Busca perfil usando cookie HttpOnly (NÃO token da URL) ──
         const user = await refreshProfile();
 
         if (!user) {
           throw new Error("Perfil não encontrado após autenticação.");
         }
 
-        // ── 6. Redireciona para home ──────────────────────────────
+        console.log("[LoginSuccessPage] Autenticação concluída com sucesso");
+
+        // ── 3. Redireciona para área autenticada ──────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
 
       } catch (err) {
-        console.error("[LoginSuccessPage] Erro:", err);
-        localStorage.removeItem("accessToken"); // limpa token inválido
+        // ── 4. Tratamento de erro ─────────────────────────────────
+        console.error("[LoginSuccessPage] Erro ao processar autenticação:", err);
+
         setStatus("error");
         setErrorMsg("Não foi possível autenticar. Tente novamente.");
+
         setTimeout(() => {
           navigate("/login", { replace: true });
         }, 2500);

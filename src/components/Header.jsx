@@ -3,6 +3,11 @@ import { useAuth } from "../context/AuthContext";
 import { getDisplayName } from "../utils/displayUserName";
 import "./Header.css";
 
+/**
+ * User avatar component
+ * Shows user's avatar image if available, otherwise shows first letter of name
+ * Avatar URL is sanitized during user normalization to prevent XSS
+ */
 function UserAvatar({ user }) {
   const label = getDisplayName(user);
   if (user?.avatarUrl) {
@@ -28,6 +33,13 @@ function UserAvatar({ user }) {
 export function Header() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const displayName = getDisplayName(user);
+
+  const handleLogout = async () => {
+    // Logout removes token from sessionStorage and calls backend
+    // Backend clears HttpOnly cookie
+    // AuthContext updates state to null
+    await logout();
+  };
 
   return (
     <header className="header">
@@ -88,7 +100,12 @@ export function Header() {
                 <UserAvatar user={user} />
                 <span className="header__user-name">{displayName}</span>
               </Link>
-              <button type="button" className="header__logout" onClick={() => logout()}>
+              <button 
+                type="button" 
+                className="header__logout" 
+                onClick={handleLogout}
+                title="Fazer logout e limpar sessão"
+              >
                 Sair
               </button>
             </>

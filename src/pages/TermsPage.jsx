@@ -117,7 +117,8 @@ export function TermsPage() {
 
     try {
       await acceptTerms?.();
-      localStorage.setItem("termos_aceito", "true");
+      // Backend mantém o estado de termos_aceitos
+      // Não armazenar em localStorage para evitar inconsistência com backend
       setTimeout(() => {
         navigate("/", { replace: true });
       }, 500);

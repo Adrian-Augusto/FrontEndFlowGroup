@@ -2,6 +2,21 @@ import axios from "axios";
 import { API_BASE, getApiOrigin } from "./routes";
 
 export const AUTH_LOGOUT_EVENT = "auth:logout";
+export const AUTH_REFRESH_EVENT = "auth:refresh";
+
+/**
+ * Retrieves access token from sessionStorage
+ * Note: We use sessionStorage instead of localStorage for better security
+ * sessionStorage is cleared when browser tab closes and is not accessible to other tabs
+ */
+function getAccessToken() {
+  try {
+    return sessionStorage.getItem("accessToken");
+  } catch (err) {
+    console.error("[axiosClient] Erro ao recuperar token de sessionStorage:", err);
+    return null;
+  }
+}
 
 /**
  * baseURL aponta para o backend no Render.
@@ -17,7 +32,8 @@ export const httpClient = axios.create({
 });
 
 httpClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  // Get token from sessionStorage (secure) not localStorage
+  const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
     // Com Bearer token, não precisamos de cookies cross-site
@@ -35,7 +51,7 @@ httpClient.interceptors.request.use((config) => {
     config.headers["Content-Type"] = "application/json";
   }
 
-  // Debug: log request details
+  // Debug: log request details (sem expor token)
   console.log("[axiosClient] Request:", {
     url: config.url,
     method: config.method,
@@ -53,21 +69,29 @@ httpClient.interceptors.response.use(
     const skipConsoleError = error.config?.skipConsoleError === true;
 
     if (!skipConsoleError) {
-      // Debug: log error details
+      // Debug: log error details (sem expor dados sensíveis)
       console.error("API Error:", {
         status: error.response?.status,
         statusText: error.response?.statusText,
         url: error.config?.url,
         method: error.config?.method,
-        data: error.response?.data,
         message: error.message,
       });
     }
 
+    // Handle 401 Unauthorized - trigger logout
     if (error.response?.status === 401 && !skipLogout) {
       // Dispatch logout event for AuthContext to handle
       window.dispatchEvent(new CustomEvent(AUTH_LOGOUT_EVENT));
     }
+
+    // Handle 403 Forbidden - trigger logout (user permissions revoked)
+    if (error.response?.status === 403 && !skipLogout) {
+      // User authenticated but not authorized - also logout
+      console.warn("[axiosClient] Access forbidden (403) - logging out");
+      window.dispatchEvent(new CustomEvent(AUTH_LOGOUT_EVENT));
+    }
+
     return Promise.reject(error);
   },
 );
@@ -81,7 +105,7 @@ export function resolveApiPath(path) {
 }
 
 export async function apiRequest(path, options = {}) {
-  const { method = "GET", body, headers, skipAuthLogout, ...rest } = options;
+  const { method = "GET", body, headers, skipAuthLogout, skipConsoleError, ...rest } = options;
 
   const res = await httpClient.request({
     url: resolveApiPath(path),
@@ -89,6 +113,7 @@ export async function apiRequest(path, options = {}) {
     data: body,
     headers,
     skipAuthLogout,
+    skipConsoleError,
     ...rest,
   });
 
