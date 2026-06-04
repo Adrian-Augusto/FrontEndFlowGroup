@@ -13,6 +13,7 @@ import fs from "fs";
 import { orderGroups, validatePagination } from "./utils/groupOrdering.js";
 
 const PORT = Number(process.env.PORT) || 8080;
+const SERVER_ORIGIN = process.env.SERVER_ORIGIN || `http://localhost:${Number(process.env.PORT) || 8080}`;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
   .split(",")
@@ -105,7 +106,7 @@ app.post("/api/v1/upload/group-photo", upload.single("photo"), (req, res) => {
     console.log(`[SERVER] File exists at ${filePath}:`, fileExists);
     
     const photoUrl = `/uploads/groups/${req.file.filename}`;
-    const fullUrl = `http://localhost:8080${photoUrl}`;
+    const fullUrl = `${SERVER_ORIGIN}${photoUrl}`;
     
     console.log("[SERVER] ✅ Upload bem-sucedido", { photoUrl, fullUrl, fileExists });
     
@@ -128,8 +129,8 @@ app.use(express.json());
 
 const COOKIE_OPTS = {
   httpOnly: true,
-  secure: false, // Desabilitar em desenvolvimento para garantir que funcione com localhost
-  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production", // true em prod (HTTPS), false em dev
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // none p/ cross-site em prod
   path: "/",
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
