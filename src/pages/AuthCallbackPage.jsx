@@ -17,6 +17,7 @@ export function AuthCallbackPage() {
     (async () => {
       // ── 1. Captura params ANTES de limpar a URL ──────────────────
       const params = new URLSearchParams(window.location.search);
+      const codeParam = params.get("code");
       const errorParam = params.get("error");
 
       // ── 2. Limpa a URL imediatamente (segurança) ─────────────────
@@ -37,29 +38,43 @@ export function AuthCallbackPage() {
         return;
       }
 
-      try {
-        // ── 4. Confirma cookie HttpOnly via fetch com credentials ──
-        // Usa fetch nativo para garantir envio do cookie cross-site
-        // O token JWT está no cookie HttpOnly — nunca vem na URL
-        const PROFILE_URL =
-          "https://allgrops.onrender.com/api/v1/auth/google/profile";
+      if (!codeParam) {
+        console.warn("[AuthCallbackPage] Código de autorização ausente.");
+        navigate("/login?error=auth_failed", { replace: true });
+        return;
+      }
 
-        console.log("[AuthCallbackPage] Validando cookie HttpOnly...");
-        const res = await fetch(PROFILE_URL, {
-          method: "GET",
-          credentials: "include",
-          headers: { Accept: "application/json" },
+      try {
+        // ── 4. Troca o código temporário pelo token JWT ─────────────
+        const apiOrigin = import.meta.env.VITE_API_ORIGIN?.trim() || "https://allgrops.onrender.com";
+        const EXCHANGE_URL = `${apiOrigin.replace(/\/$/, "")}/api/v1/auth/exchange-code`;
+
+        console.log("[AuthCallbackPage] Trocando código temporário...");
+        const res = await fetch(EXCHANGE_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ code: codeParam }),
         });
 
         if (!res.ok) {
-          // 401 = cookie ausente ou expirado → redireciona para login
-          console.warn(
-            "[AuthCallbackPage] Cookie inválido ou ausente:",
-            res.status
-          );
+          console.warn("[AuthCallbackPage] Falha na troca do código:", res.status);
           navigate("/login?error=auth_failed", { replace: true });
           return;
         }
+
+        // Extrai o JSON e obtém o token retornado pelo backend
+        const data = await res.json();
+        const token = data?.accessToken ?? data?.token;
+        if (!token) {
+          throw new Error("Token não retornado pelo servidor.");
+        }
+
+        console.log("[AuthCallbackPage] Token recebido com sucesso.");
+        const { authService } = await import("../auth/authService");
+        authService.setAccessToken(token);
 
         // ── 5. Salva usuário no estado da aplicação ───────────────
         // refreshProfile busca /auth/google/profile novamente via Axios
