@@ -154,13 +154,16 @@ export function MyGroupsPage() {
         </Link>
       </header>
 
-      {/* Widget de Patrocínios */}
+      {/* Widget de impulsionamentos */}
       {sponsorshipLimits && (
         <div className="my-groups__sponsorship-card">
           <div className="my-groups__sponsorship-info">
             <h2 className="my-groups__sponsorship-title">
-              🚀 Meus Patrocínios (Destaques)
+              Impulsionar meus grupos
             </h2>
+            <p className="my-groups__sponsorship-description">
+              Use seus créditos para colocar grupos aprovados em posições de maior visibilidade.
+            </p>
             <div className="my-groups__sponsorship-stats">
               <span>Créditos disponíveis:</span>
               <strong>
@@ -175,7 +178,7 @@ export function MyGroupsPage() {
             onClick={() => handleOpenTurbinarModal()}
             disabled={!canSponsorMore}
           >
-            ⭐ Turbinar Novo Grupo
+            Impulsionar grupo
           </button>
         </div>
       )}
@@ -249,8 +252,8 @@ export function MyGroupsPage() {
                 </button>
                 {g.status === "APPROVED" && (
                   g.featured ? (
-                    <span className="my-groups__turbinado-badge" title="Este grupo já está patrocinado e aparece no topo.">
-                      ⭐ Turbinado
+                    <span className="my-groups__turbinado-badge" title="Este grupo já está impulsionado e aparece em posições de maior visibilidade.">
+                      Impulsionado
                     </span>
                   ) : (
                     <button
@@ -259,7 +262,7 @@ export function MyGroupsPage() {
                       onClick={() => handleOpenTurbinarModal(g.id)}
                       disabled={!canSponsorMore}
                     >
-                      🚀 Turbinar Grupo
+                      Impulsionar grupo
                     </button>
                   )
                 )}

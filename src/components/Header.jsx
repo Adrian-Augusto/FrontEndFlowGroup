@@ -1,15 +1,12 @@
+import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getDisplayName } from "../utils/displayUserName";
 import "./Header.css";
 
-/**
- * User avatar component
- * Shows user's avatar image if available, otherwise shows first letter of name
- * Avatar URL is sanitized during user normalization to prevent XSS
- */
 function UserAvatar({ user }) {
   const label = getDisplayName(user);
+
   if (user?.avatarUrl) {
     return (
       <img
@@ -23,6 +20,7 @@ function UserAvatar({ user }) {
       />
     );
   }
+
   return (
     <span className="header__avatar header__avatar--fallback" aria-hidden="true">
       {label.charAt(0).toUpperCase()}
@@ -32,19 +30,20 @@ function UserAvatar({ user }) {
 
 export function Header() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
   const displayName = getDisplayName(user);
 
+  const closeMobileMenu = () => setMobileOpen(false);
+
   const handleLogout = async () => {
-    // Logout removes token from sessionStorage and calls backend
-    // Backend clears HttpOnly cookie
-    // AuthContext updates state to null
     await logout();
+    closeMobileMenu();
   };
 
   return (
     <header className="header">
       <div className="header__inner">
-        <Link to="/" className="header__brand" aria-label="FlowGroup — início">
+        <Link to="/" className="header__brand" aria-label="FlowGroup inicio" onClick={closeMobileMenu}>
           <span className="header__logo" aria-hidden="true">
             <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect width="32" height="32" rx="8" fill="currentColor" />
@@ -60,60 +59,79 @@ export function Header() {
           <span className="header__name">FlowGroup</span>
         </Link>
 
-        <nav className="header__nav" aria-label="Principal">
-          <NavLink
-            to="/#destaques"
-            className="header__link"
-            onClick={(e) => {
-              if (window.location.pathname === "/") {
-                e.preventDefault();
-                document.getElementById("destaques")?.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-          >
-            Destaques
-          </NavLink>
-          <NavLink to="/planos" className="header__link">
-            Planos
-          </NavLink>
-          {isAuthenticated && (
-            <>
-              <NavLink to="/meus-grupos" className="header__link header__link--muted">
-                Meus grupos
-              </NavLink>
-              <NavLink to="/perfil" className="header__link header__link--muted">
-                Perfil
-              </NavLink>
-            </>
-          )}
-          {isAdmin && (
-            <NavLink to="/admin" className="header__link header__link--admin">
-              Admin
-            </NavLink>
-          )}
-        </nav>
+        <button
+          type="button"
+          className={`header__menu-btn ${mobileOpen ? "header__menu-btn--open" : ""}`}
+          aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="header-mobile-menu"
+          onClick={() => setMobileOpen((open) => !open)}
+        >
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+        </button>
 
-        <div className="header__actions">
-          {isAuthenticated ? (
-            <>
-              <Link to="/perfil" className="header__profile-link" title="Ver perfil">
-                <UserAvatar user={user} />
-                <span className="header__user-name">{displayName}</span>
+        <div
+          id="header-mobile-menu"
+          className={`header__menu ${mobileOpen ? "header__menu--open" : ""}`}
+        >
+          <nav className="header__nav" aria-label="Principal">
+            <NavLink
+              to="/#destaques"
+              className="header__link"
+              onClick={(e) => {
+                if (window.location.pathname === "/") {
+                  e.preventDefault();
+                  document.getElementById("destaques")?.scrollIntoView({ behavior: "smooth" });
+                }
+                closeMobileMenu();
+              }}
+            >
+              Destaques
+            </NavLink>
+            <NavLink to="/planos" className="header__link" onClick={closeMobileMenu}>
+              Planos
+            </NavLink>
+            {isAuthenticated && (
+              <>
+                <NavLink to="/meus-grupos" className="header__link header__link--muted" onClick={closeMobileMenu}>
+                  Meus grupos
+                </NavLink>
+                <NavLink to="/perfil" className="header__link header__link--muted" onClick={closeMobileMenu}>
+                  Perfil
+                </NavLink>
+              </>
+            )}
+            {isAdmin && (
+              <NavLink to="/admin" className="header__link header__link--admin" onClick={closeMobileMenu}>
+                Admin
+              </NavLink>
+            )}
+          </nav>
+
+          <div className="header__actions">
+            {isAuthenticated ? (
+              <>
+                <Link to="/perfil" className="header__profile-link" title="Ver perfil" onClick={closeMobileMenu}>
+                  <UserAvatar user={user} />
+                  <span className="header__user-name">{displayName}</span>
+                </Link>
+                <button
+                  type="button"
+                  className="header__logout"
+                  onClick={handleLogout}
+                  title="Fazer logout e limpar sessao"
+                >
+                  Sair
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="header__login-btn" onClick={closeMobileMenu}>
+                Entrar
               </Link>
-              <button 
-                type="button" 
-                className="header__logout" 
-                onClick={handleLogout}
-                title="Fazer logout e limpar sessão"
-              >
-                Sair
-              </button>
-            </>
-          ) : (
-            <Link to="/login" className="header__login-btn">
-              Entrar
-            </Link>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </header>

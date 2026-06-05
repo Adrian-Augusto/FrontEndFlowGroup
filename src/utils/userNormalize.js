@@ -122,9 +122,12 @@ export function normalizeUser(data) {
     rawUser.photoUrl ??
     rawUser.profilePicture ??
     rawUser.profile_picture ??
+    rawUser.profilePhoto ??
+    rawUser.profile_photo ??
     rawUser.image ??
     rawUser.imageUrl ??
     rawUser.image_url ??
+    rawUser.photoURL ??
     null;
 
   // Normalize uploaded image paths without losing the backend origin.

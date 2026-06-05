@@ -1,13 +1,23 @@
 import { apiRequest } from "./axiosClient";
 import { API_ROUTES } from "./routes";
+import { getApiOrigin } from "./routes";
 
 async function request(path, options = {}) {
   try {
     return await apiRequest(path, options);
   } catch (err) {
     const msg = err.response?.data?.message ?? err.message ?? "Erro de rede";
-    throw new Error(msg);
+    throw new Error(msg, { cause: err });
   }
+}
+
+function normalizeUploadUrl(url) {
+  if (!url || typeof url !== "string") return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith("http")) return trimmed;
+  if (trimmed.startsWith("/")) return `${getApiOrigin().replace(/\/$/, "")}${trimmed}`;
+  return `${getApiOrigin().replace(/\/$/, "")}/${trimmed}`;
 }
 
 export const uploadApi = {
@@ -41,7 +51,7 @@ export const uploadApi = {
 
       console.log("[uploadApi] Resposta completa:", data);
 
-      const url = data?.photoUrl ?? data?.fullUrl ?? data?.url ?? null;
+      const url = normalizeUploadUrl(data?.fullUrl ?? data?.photoUrl ?? data?.url);
 
       if (!url) {
         console.error("[uploadApi] URL não recebida na resposta:", data);

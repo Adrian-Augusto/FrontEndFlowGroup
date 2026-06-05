@@ -1,5 +1,6 @@
 import { DEFAULT_PHOTO } from "../data/groups";
 import { findCategoryByIdOrName } from "../constants/categories";
+import { getApiOrigin } from "../api/routes";
 
 const SAMPLE_GROUP_DESCRIPTIONS = {
   g1: "Promoções de eletrônicos, cupons e oportunidades para comprar melhor em São Paulo.",
@@ -28,16 +29,11 @@ function normalizeDescription(raw) {
 function normalizePhotoUrl(url) {
   if (!url) return DEFAULT_PHOTO;
 
-  if (url.startsWith("http") && url.includes("/uploads/")) {
-    const parts = url.split("/uploads/");
-    return "/uploads/" + parts[parts.length - 1];
-  }
-
   if (url.startsWith("http")) return url;
 
   if (url.startsWith("uploads/") || url.startsWith("/uploads/")) {
     const cleanUrl = url.startsWith("/") ? url.substring(1) : url;
-    return `/uploads/${cleanUrl.replace(/^uploads\//, "")}`;
+    return `${getApiOrigin().replace(/\/$/, "")}/uploads/${cleanUrl.replace(/^uploads\//, "")}`;
   }
 
   if (url.startsWith("/")) return url;

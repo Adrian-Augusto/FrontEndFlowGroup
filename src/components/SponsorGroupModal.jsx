@@ -42,7 +42,7 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
 
   const handleSponsor = async () => {
     if (!selectedGroupId) {
-      setError("Selecione um grupo para patrocinar");
+      setError("Selecione um grupo para impulsionar");
       return;
     }
 
@@ -55,7 +55,7 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
       onSponsorSuccess?.();
       onClose();
     } catch (err) {
-      setError(err?.message ?? "Erro ao patrocinar grupo");
+      setError(err?.message ?? "Erro ao impulsionar grupo");
     } finally {
       setLoading(false);
     }
@@ -75,7 +75,7 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
       <div className="modal modal--medium" role="dialog" aria-modal="true" aria-labelledby={titleId}>
         <header className="modal__header">
           <h2 id={titleId} className="modal__title">
-            Patrocinar Grupo
+            Impulsionar grupo
           </h2>
           <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -109,7 +109,7 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
 
           {!canSponsorMore && sponsorshipLimits && (
             <div className="modal__alert modal__alert--warning">
-              <span>⚠️ Você atingiu o limite de patrocínios. Atualize seu plano para patrocinar mais grupos.</span>
+              <span>⚠️ Você atingiu o limite de impulsionamentos. Atualize seu plano para impulsionar mais grupos.</span>
             </div>
           )}
 
@@ -118,12 +118,12 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
               <p>
                 {userGroups.length === 0
                   ? "Você não possui nenhum grupo criado."
-                  : "Todos os seus grupos já estão patrocinados ou aguardando aprovação."}
+                  : "Todos os seus grupos já estão impulsionados ou aguardando aprovação."}
               </p>
             </div>
           ) : (
             <div className="sponsor-modal__groups">
-              <p className="sponsor-modal__label">Selecione o grupo para patrocinar:</p>
+              <p className="sponsor-modal__label">Selecione o grupo para impulsionar:</p>
               <div className="sponsor-modal__list">
                 {sponsorableGroups.map((group) => (
                   <label key={group.id} className="sponsor-modal__group-item">
@@ -160,7 +160,7 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
             onClick={handleSponsor}
             disabled={loading || !canSponsorMore || sponsorableGroups.length === 0}
           >
-            {loading ? "Patrocinando…" : "Patrocinar"}
+            {loading ? "Impulsionando..." : "Impulsionar"}
           </button>
         </footer>
       </div>

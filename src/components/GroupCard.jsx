@@ -5,6 +5,14 @@ function formatMembers(count) {
   return new Intl.NumberFormat("pt-BR").format(count);
 }
 
+function normalizeGroupLink(link) {
+  if (!link || typeof link !== "string") return "";
+  const trimmed = link.trim();
+  if (!trimmed) return "";
+  if (/^(https?:|whatsapp:|tg:|discord:)/i.test(trimmed)) return trimmed;
+  return `https://${trimmed.replace(/^\/+/, "")}`;
+}
+
 export function GroupCard({ group, showStatus = false, showFeaturedBadge = false }) {
   const statusLabel = {
     pending: "Aguardando aprovação",
@@ -12,12 +20,32 @@ export function GroupCard({ group, showStatus = false, showFeaturedBadge = false
     approved: "Aprovado",
   };
 
-  // Para grupos na página pública: mostrar link se existe (backend retorna apenas aprovados)
-  // Para grupos no admin: mostrar link apenas se aprovado
-  const canOpen = group.link && (group.status === "approved" || !showStatus);
+  const groupLink = normalizeGroupLink(group.link);
+  const canOpen = Boolean(groupLink) && (group.status === "approved" || !showStatus);
+
+  const openGroup = () => {
+    if (!canOpen) return;
+    window.open(groupLink, "_blank", "noopener,noreferrer");
+  };
+
+  const handleKeyDown = (event) => {
+    if (!canOpen) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openGroup();
+    }
+  };
 
   return (
-    <article className={`group-card ${showFeaturedBadge ? "group-card--sponsored" : ""}`}>
+    <article
+      className={`group-card ${canOpen ? "group-card--clickable" : ""} ${
+        showFeaturedBadge ? "group-card--sponsored" : ""
+      }`}
+      role={canOpen ? "link" : undefined}
+      tabIndex={canOpen ? 0 : undefined}
+      onClick={openGroup}
+      onKeyDown={handleKeyDown}
+    >
       <div className="group-card__cover">
         <img
           src={group.photo}
@@ -56,11 +84,13 @@ export function GroupCard({ group, showStatus = false, showFeaturedBadge = false
         )}
 
         {canOpen ? (
-          <a
-            href={group.link}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
             className="group-card__btn"
+            onClick={(event) => {
+              event.stopPropagation();
+              openGroup();
+            }}
           >
             Abrir grupo
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -72,10 +102,14 @@ export function GroupCard({ group, showStatus = false, showFeaturedBadge = false
                 strokeLinejoin="round"
               />
             </svg>
-          </a>
+          </button>
         ) : (
           <p className="group-card__hint">
-            {!group.link ? "Sem link disponível" : group.status === "pending" ? "Link disponível após aprovação" : "Grupo não disponível"}
+            {!group.link
+              ? "Sem link disponível"
+              : group.status === "pending"
+                ? "Link disponível após aprovação"
+                : "Grupo não disponível"}
           </p>
         )}
       </div>
