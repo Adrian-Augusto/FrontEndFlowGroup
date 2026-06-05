@@ -228,55 +228,6 @@ export function ProfilePage() {
             </div>
 
             <div className="profile-page__column profile-page__column--main">
-              {/* Seção de Patrocínios */}
-              {sponsorshipLimits && (
-                <div className="profile-page__card">
-                  <h3 className="profile-page__section-title">Meus Patrocínios</h3>
-                  
-                  <div className="profile-page__sponsorship">
-                    <div className="sponsorship-progress">
-                      <div className="sponsorship-progress__label">
-                        <span>Grupos Patrocinados</span>
-                        <strong>
-                          {sponsorshipLimits.sponsoredGroups?.active || 0}/
-                          {sponsorshipLimits.sponsoredGroups?.max || 5}
-                        </strong>
-                      </div>
-                      <div className="sponsorship-progress__bar">
-                        {Array.from({ length: sponsorshipLimits.sponsoredGroups?.max || 5 }).map(
-                          (_, i) => (
-                            <div
-                              key={i}
-                              className={`sponsorship-progress__slot ${
-                                i < (sponsorshipLimits.sponsoredGroups?.active || 0)
-                                  ? "sponsorship-progress__slot--filled"
-                                  : ""
-                              }`}
-                            />
-                          )
-                        )}
-                      </div>
-                      <p className="sponsorship-progress__remaining">
-                        Espaço disponível: {(sponsorshipLimits.sponsoredGroups?.max || 5) - (sponsorshipLimits.sponsoredGroups?.active || 0)}
-                      </p>
-                    </div>
-                    
-                    {canSponsorMore ? (
-                      <div className="profile-page__sponsorship-status profile-page__sponsorship-status--available">
-                        <p>✅ Você pode patrocinar mais grupos!</p>
-                      </div>
-                    ) : (
-                      <div className="profile-page__sponsorship-status profile-page__sponsorship-status--limited">
-                        <p>⚠️ Você atingiu o limite de patrocínios.</p>
-                        <Link to="/planos" className="profile-page__upgrade-btn">
-                          Fazer upgrade
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
               <div className="profile-page__card">
                 <h3 className="profile-page__section-title">Minha Assinatura</h3>
 

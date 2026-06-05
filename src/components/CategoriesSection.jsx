@@ -60,6 +60,21 @@ export function CategoriesSection({ groups = [], onCategorySelect = () => {}, se
 
   return (
     <div className="categories-container">
+      {/* Botão Hamburger para mobile */}
+      <button
+        className={`categories-hamburger ${sidebarOpen ? "active" : ""}`}
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label="Abrir menu de categorias"
+        type="button"
+      >
+        <div className="hamburger-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <span className="hamburger-label">MENU</span>
+      </button>
+
       {/* Overlay */}
       {sidebarOpen && (
         <div
