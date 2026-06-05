@@ -10,6 +10,11 @@ function sanitizeAvatarUrl(url) {
 
   const trimmed = url.trim();
 
+  // Allow data URIs (base64 images)
+  if (trimmed.startsWith("data:image/")) {
+    return trimmed;
+  }
+
   // Allow relative paths for uploaded images
   if (trimmed.startsWith("/uploads/")) {
     // Ensure no path traversal attempts
