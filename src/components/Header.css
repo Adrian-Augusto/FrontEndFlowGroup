@@ -240,15 +240,27 @@
   }
 
   .header__nav {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: stretch;
     gap: 0.35rem;
   }
 
   .header__link {
+    flex: 1 1 auto;
+    min-width: 0;
     font-size: 0.8125rem;
     padding: 0.7rem 0.75rem;
     border-radius: var(--radius-sm);
+  }
+
+  .header__link:nth-child(1),
+  .header__link:nth-child(2) {
+    flex: 1 1 calc(50% - 0.175rem);
+  }
+
+  .header__link:nth-child(n+3) {
+    flex: 1 1 100%;
   }
 
   .header__link:hover,
