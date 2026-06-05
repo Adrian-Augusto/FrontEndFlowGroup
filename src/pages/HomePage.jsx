@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Hero } from "../components/Hero";
 import { FeaturedGroupsSection } from "../components/FeaturedGroupsSection";
+import { MyGroupsSection } from "../components/MyGroupsSection";
 import { CategoriesSection } from "../components/CategoriesSection";
 import { GroupGrid } from "../components/GroupGrid";
 import { CreateGroupModal } from "../components/CreateGroupModal";
@@ -88,6 +89,7 @@ export function HomePage() {
       <CategoriesSection groups={approvedGroups} onCategorySelect={setCategoryFilter} selectedCategory={categoryFilter} />
       <Hero />
       <FeaturedGroupsSection groups={approvedGroups} />
+      <MyGroupsSection />
       <GroupGrid
         groups={filteredGroups}
         searchQuery={searchQuery}

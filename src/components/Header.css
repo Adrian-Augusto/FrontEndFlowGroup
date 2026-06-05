@@ -263,6 +263,17 @@
     flex: 1 1 100%;
   }
 
+  .header__link--publish {
+    background: var(--color-purple-600);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .header__link--publish:hover {
+    background: var(--color-purple-700);
+    color: #fff;
+  }
+
   .header__link:hover,
   .header__link.active {
     background: var(--color-purple-50);
