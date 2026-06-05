@@ -340,7 +340,7 @@
 }
 
 /* Mobile - Mostrar hamburger */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .categories-hamburger {
     display: flex !important;
   }
@@ -355,7 +355,7 @@
 }
 
 /* Desktop - Sidebar fixo */
-@media (min-width: 1025px) {
+@media (min-width: 769px) {
   .categories-hamburger {
     display: none !important;
   }
