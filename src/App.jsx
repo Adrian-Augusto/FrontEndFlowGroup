@@ -13,6 +13,7 @@ import { AuthCallbackPage } from "./pages/AuthCallbackPage";
 import { TermsPage } from "./pages/TermsPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { MyGroupsPage } from "./pages/MyGroupsPage";
+import { CreateGroupPage } from "./pages/groups/CreateGroupPage";
 import { PlansPage } from "./pages/PlansPage";
 import { PaymentStatusPage } from "./pages/PaymentStatusPage";
 import { AdminPage } from "./pages/AdminPage";
@@ -46,6 +47,14 @@ export default function App() {
                       element={
                         <ProtectedRoute>
                           <MyGroupsPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="groups/create"
+                      element={
+                        <ProtectedRoute>
+                          <CreateGroupPage />
                         </ProtectedRoute>
                       }
                     />

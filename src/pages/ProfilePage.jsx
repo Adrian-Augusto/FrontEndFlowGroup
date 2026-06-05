@@ -177,20 +177,25 @@ export function ProfilePage() {
             <div className="profile-page__column profile-page__column--sidebar">
               <div className="profile-page__card">
                 <div className="profile-page__hero">
-                  {user.avatarUrl ? (
+                  {user.avatarUrl && typeof user.avatarUrl === 'string' && user.avatarUrl.length > 0 ? (
                     <img
                       src={user.avatarUrl}
-                      alt=""
+                      alt="Avatar do usuário"
                       className="profile-page__photo"
                       width={96}
                       height={96}
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling?.classList.add('profile-page__photo--fallback');
+                      }}
                     />
-                  ) : (
-                    <span className="profile-page__photo profile-page__photo--fallback">
+                  ) : null}
+                  {!user.avatarUrl || typeof user.avatarUrl !== 'string' || user.avatarUrl.length === 0 ? (
+                    <span className="profile-page__photo profile-page__photo--fallback" aria-hidden="true">
                       {displayName.charAt(0).toUpperCase()}
                     </span>
-                  )}
+                  ) : null}
                   <div>
                     <h2 className="profile-page__name">{displayName}</h2>
                     <p className="profile-page__email">{user.email ?? "—"}</p>

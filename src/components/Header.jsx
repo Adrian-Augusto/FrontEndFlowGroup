@@ -7,16 +7,19 @@ import "./Header.css";
 function UserAvatar({ user }) {
   const label = getDisplayName(user);
 
-  if (user?.avatarUrl) {
+  if (user?.avatarUrl && typeof user.avatarUrl === 'string' && user.avatarUrl.length > 0) {
     return (
       <img
         src={user.avatarUrl}
-        alt=""
+        alt="Avatar do usuário"
         className="header__avatar"
         width={36}
         height={36}
         referrerPolicy="no-referrer"
         decoding="async"
+        onError={(e) => {
+          e.target.style.display = 'none';
+        }}
       />
     );
   }
@@ -95,6 +98,9 @@ export function Header() {
             </NavLink>
             {isAuthenticated && (
               <>
+                <NavLink to="/groups/create" className="header__link header__link--publish" onClick={closeMobileMenu}>
+                  + Publicar
+                </NavLink>
                 <NavLink to="/meus-grupos" className="header__link header__link--muted" onClick={closeMobileMenu}>
                   Meus grupos
                 </NavLink>
