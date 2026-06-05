@@ -126,14 +126,6 @@ export function AuthCallbackPage() {
     );
   }
 
-  return (
-    <div className="auth-callback">
-      <div className="auth-callback__loading-box">
-        <div className="auth-callback__spinner" aria-hidden="true" />
-        <p className="auth-callback__loading" role="status" aria-live="polite">
-          Concluindo login…
-        </p>
-      </div>
-    </div>
-  );
+  // Processa em background sem mostrar tela de loading
+  return null;
 }
