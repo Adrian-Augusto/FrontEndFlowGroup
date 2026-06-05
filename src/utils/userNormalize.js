@@ -112,23 +112,6 @@ export function normalizeUser(data) {
     rawUser.imageUrl ??
     null;
 
-  // Try to recover avatar from sessionStorage (uses sessionStorage for security)
-  if (!avatarUrl) {
-    try {
-      const stored = sessionStorage.getItem("userAvatar");
-      if (stored) {
-        if (stored.startsWith("{")) {
-          const parsed = JSON.parse(stored);
-          avatarUrl = parsed?.avatarUrl || parsed?.profileImage || null;
-        } else {
-          avatarUrl = stored;
-        }
-      }
-    } catch (e) {
-      // Ignore parsing errors
-    }
-  }
-
   // Normalize /uploads paths
   if (avatarUrl && typeof avatarUrl === "string" && avatarUrl.includes("/uploads/")) {
     const parts = avatarUrl.split("/uploads/");
