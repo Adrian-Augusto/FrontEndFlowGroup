@@ -32,6 +32,7 @@ export const API_ROUTES = {
     create: apiPath("groups"),
     update: (id) => apiPath("groups", id),
     delete: (id) => apiPath("groups", id),
+    feature: (id) => apiPath("groups", id, "feature"),
     join: (id) => apiPath("groups", id, "join"),
   },
   upload: {

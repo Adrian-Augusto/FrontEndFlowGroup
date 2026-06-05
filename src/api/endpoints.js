@@ -10,6 +10,9 @@ export const endpoints = {
     list: "/groups",
     mine: "/groups/me",
     create: "/groups",
+    delete: (id) => `/groups/${id}`,
+    update: (id) => `/groups/${id}`,
+    limits: "/groups/limits",
   },
   admin: {
     stats: "/admin/stats",

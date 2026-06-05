@@ -288,7 +288,7 @@ export const groupsApi = {
   async sponsorGroup(groupId) {
     if (!USE_MOCK) {
       try {
-        const data = await request(`${API_ROUTES.groups.list}/${groupId}/feature`, {
+        const data = await request(API_ROUTES.groups.feature(groupId), {
           method: "POST",
         });
         return data;
