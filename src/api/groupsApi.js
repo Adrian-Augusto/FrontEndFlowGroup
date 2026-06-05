@@ -1,4 +1,3 @@
-import { endpoints } from "./endpoints";
 import { API_ROUTES } from "./routes";
 import { apiRequest } from "./axiosClient";
 import { GROUP_STATUS, INITIAL_GROUPS, DEFAULT_PHOTO } from "../data/groups";
@@ -67,7 +66,7 @@ export const groupsApi = {
     return filterMyGroups(loadMock(), user);
   },
 
-  async create({ name, description, categoryId, title, link, platform, photoFile, ...rest }) {
+  async create({ name, description, categoryId, title, link, platform, photoFile }) {
     /**
      * Backend API expects JSON: { name, description, link, platform, photoUrl, categoryId }
      * Frontend sends: { title/name, description, categoryId, link, platform, photoFile }
@@ -85,7 +84,11 @@ export const groupsApi = {
       }
 
       // Upload photo using multipart/form-data
-      let photoUrl = DEFAULT_PHOTO;
+      if (!(photoFile instanceof File) || photoFile.size === 0) {
+        throw new Error("Foto é obrigatória");
+      }
+
+      let photoUrl;
       if (photoFile instanceof File && photoFile.size > 0) {
         try {
           console.log("[groupsApi] Tentando upload de foto:", photoFile.name);
@@ -96,37 +99,22 @@ export const groupsApi = {
             urlLength: photoUrl?.length
           });
           if (!photoUrl) {
-            console.warn("[groupsApi] Upload retornou URL vazia, usando padrão");
-            photoUrl = DEFAULT_PHOTO;
+            console.warn("[groupsApi] Upload retornou URL vazia");
+            throw new Error("Upload da foto não retornou uma URL válida");
           }
         } catch (err) {
           console.error("[groupsApi] Erro ao fazer upload da foto:", err);
           // Propagar o erro para que a UI possa exibir mensagem adequada
-          throw new Error(err.message || "Erro ao fazer upload da foto");
+          throw new Error(err.message || "Erro ao fazer upload da foto", { cause: err });
         }
       }
-
-      console.log("[groupsApi] PhotoUrl final:", {
-        isDefault: photoUrl === DEFAULT_PHOTO,
-        urlLength: photoUrl?.length
-      });
-
-      // Backend API expects JSON with these fields
-      // Gerar UUID aleatório para categoria se não fornecida
-      const generateUUID = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-          const r = Math.random() * 16 | 0;
-          const v = c === 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      };
 
       const payload = {
         title: nameValue,
         description: descriptionValue,
         link: linkValue,
         platform: platformValue,
-        photoUrl: photoUrl || DEFAULT_PHOTO,
+        photoUrl,
         category: categoryId,
       };
 
@@ -146,7 +134,7 @@ export const groupsApi = {
         description: descriptionValue,
         link: linkValue,
         platform: platformValue,
-        photoUrl: photoUrl ? `${photoUrl.substring(0, 50)}...` : "using default",
+        photoUrl: `${photoUrl.substring(0, 50)}...`,
         category: payload.category,
       });
 
@@ -159,14 +147,15 @@ export const groupsApi = {
     const user = authService.getUser();
     const groups = loadMock();
     
-    // Convert photo for mock
-    let photo = DEFAULT_PHOTO;
-    if (photoFile instanceof File && photoFile.size > 0) {
-      try {
-        photo = await fileToDataUrl(photoFile);
-      } catch (err) {
-        photo = DEFAULT_PHOTO;
-      }
+    if (!(photoFile instanceof File) || photoFile.size === 0) {
+      throw new Error("Foto é obrigatória");
+    }
+
+    let photo;
+    try {
+      photo = await fileToDataUrl(photoFile);
+    } catch (err) {
+      throw new Error("Erro ao preparar a foto", { cause: err });
     }
     
     const created = normalizeGroup({

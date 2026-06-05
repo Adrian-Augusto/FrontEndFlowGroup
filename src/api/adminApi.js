@@ -61,14 +61,19 @@ async function request(path, options = {}) {
     return await apiRequest(path, options);
   } catch (err) {
     const msg = err.response?.data?.message ?? err.message ?? "Erro de rede";
-    throw new Error(msg);
+    throw new Error(msg, { cause: err });
   }
 }
 
 export const adminApi = {
   async getStats() {
     if (!USE_MOCK) {
-      const data = await request(API_ROUTES.admin.stats);
+      let data;
+      try {
+        data = await request(API_ROUTES.admin.stats);
+      } catch {
+        data = await request(API_ROUTES.admin.groupsStats);
+      }
       return normalizeStats(data);
     }
     await delay(150);

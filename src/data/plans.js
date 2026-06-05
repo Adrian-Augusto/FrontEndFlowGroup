@@ -3,7 +3,6 @@ export const PLAN_IDS = {
   SEVEN_DAYS: "seven-days",
   FIFTEEN_DAYS: "fifteen-days",
   MONTHLY: "monthly",
-  TEST: "test",
 };
 
 export const PLANS = [
@@ -18,7 +17,7 @@ export const PLANS = [
     popular: false,
     isOffer: false,
     offerText: null,
-    categoryIds: [], // Disponível para todas as categorias
+    categoryIds: [],
     features: [
       'Posicionamento em "Grupos em destaque"',
       'Badge de "Patrocinado" no card',
@@ -86,23 +85,6 @@ export const PLANS = [
       "Até 40% de desconto na renovação",
       "Plano: PREMIUM - Até 5 grupos criados",
       "Até 3 grupos patrocinados simultaneamente",
-    ],
-  },
-  {
-    id: "test",
-    name: "Plano Teste",
-    emoji: "🧪",
-    price: 0.01,
-    originalPrice: null,
-    period: "pagamento único",
-    description: "Apenas para testar o fluxo de pagamento. Sem benefícios reais no site.",
-    popular: false,
-    isOffer: false,
-    offerText: null,
-    categoryIds: [],
-    features: [
-      "Valida integração de pagamento",
-      "Sem destaque real no site",
     ],
   },
 ];

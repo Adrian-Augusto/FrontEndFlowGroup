@@ -45,6 +45,7 @@ export const API_ROUTES = {
     reject: (id) => apiPath("admin", "groups", id, "reject"),
     delete: (id) => apiPath("admin", "groups", id),
     stats: apiPath("admin", "stats"),
+    groupsStats: apiPath("admin", "groups", "stats"),
     users: apiPath("admin", "users"),
   },
   platforms: {

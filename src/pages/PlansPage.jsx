@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { plansApi } from "../api/plansApi";
 import { groupsApi } from "../api/groupsApi";
@@ -26,40 +26,31 @@ function getSavings(plan) {
 }
 
 function normalizePlans(apiPlans) {
-  console.log("[normalizePlans] Input apiPlans:", apiPlans);
-  console.log("[normalizePlans] apiPlans.length:", apiPlans?.length);
+  const fallbackByPrice = new Map([
+    [12.9, FALLBACK_PLANS[0]],
+    [24.9, FALLBACK_PLANS[1]],
+    [39.9, FALLBACK_PLANS[2]],
+    [49.9, FALLBACK_PLANS[3]],
+  ]);
 
-  const fallbackMap = {
-    0.01: FALLBACK_PLANS[4], // test
-    12.9: FALLBACK_PLANS[0], // 3 dias
-    12.90: FALLBACK_PLANS[0], // 3 dias (alternative format)
-    24.9: FALLBACK_PLANS[1], // 7 dias
-    24.90: FALLBACK_PLANS[1], // 7 dias (alternative format)
-    39.9: FALLBACK_PLANS[2], // 15 dias
-    39.90: FALLBACK_PLANS[2], // 15 dias (alternative format)
-    49.9: FALLBACK_PLANS[3], // 30 dias
-    49.90: FALLBACK_PLANS[3], // 30 dias (alternative format)
-  };
+  return apiPlans
+    .filter((plan) => Number(plan.price) !== 0.01 && plan.id !== "test")
+    .map((plan) => {
+      const priceVal = Number(plan.price);
+      const priceKey = Math.round(priceVal * 100) / 100;
+      const fallback = fallbackByPrice.get(priceKey) || FALLBACK_PLANS[0];
 
-  const normalized = apiPlans.map((plan) => {
-    const priceVal = Number(plan.price);
-    // Try exact match first, then rounded
-    const fallback = fallbackMap[priceVal] || fallbackMap[Math.round(priceVal * 10) / 10] || FALLBACK_PLANS[0];
-    console.log("[normalizePlans] Processing plan:", { priceVal, fallbackId: fallback?.id });
-    return {
-      ...fallback,
-      id: plan.id, // USAR O UUID DA API, não o ID do fallback!
-      price: priceVal,
-    };
-  });
-
-  console.log("[normalizePlans] Output normalized:", normalized);
-  console.log("[normalizePlans] normalized.length:", normalized?.length);
-  return normalized;
+      return {
+        ...fallback,
+        id: plan.id,
+        price: priceVal,
+      };
+    });
 }
 
 export function PlansPage() {
   const { isAuthenticated, user } = useAuth();
+  const userId = user?.id;
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [selectedPlanId, setSelectedPlanId] = useState(null);
@@ -68,18 +59,13 @@ export function PlansPage() {
   const [userGroups, setUserGroups] = useState([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
 
-  // Load user groups to determine which plans to show
-  useEffect(() => {
-    if (isAuthenticated && user?.id) {
-      loadUserGroups();
-    }
-  }, [isAuthenticated, user?.id]);
+  const loadUserGroups = useCallback(async () => {
+    if (!userId) return;
 
-  const loadUserGroups = async () => {
     setLoadingGroups(true);
     try {
       const allGroups = await groupsApi.listApproved();
-      const myGroups = allGroups.filter((g) => g.createdBy?.id === user.id);
+      const myGroups = allGroups.filter((g) => g.createdBy?.id === userId);
       setUserGroups(myGroups);
     } catch (err) {
       console.error("[PlansPage] Erro ao carregar grupos do usuário:", err);
@@ -87,16 +73,19 @@ export function PlansPage() {
     } finally {
       setLoadingGroups(false);
     }
-  };
-
-  // Filter plans based on user group categories
-  const getFilteredPlans = (allPlans, groups) => {
-    // Always show all plans - filtering by category is too restrictive
-    return allPlans;
-  };
+  }, [userId]);
 
   useEffect(() => {
-    (async () => {
+    if (isAuthenticated && userId) {
+      Promise.resolve().then(loadUserGroups);
+    } else {
+      Promise.resolve().then(() => setUserGroups([]));
+    }
+  }, [isAuthenticated, loadUserGroups, userId]);
+
+  useEffect(() => {
+    async function loadPlans() {
+      setLoading(true);
       try {
         const response = await plansApi.listPlans();
         let plansData = [];
@@ -111,20 +100,22 @@ export function PlansPage() {
           plansData = FALLBACK_PLANS;
         }
 
-        const fallbackIds = ["test", "three-days", "seven-days", "fifteen-days", "monthly"];
-        const isBackendResponse = plansData?.length && plansData[0].id && !fallbackIds.includes(plansData[0].id);
-        const normalized = isBackendResponse ? normalizePlans(plansData) : plansData;
-        const basePlans = normalized?.length ? normalized : FALLBACK_PLANS;
+        plansData = plansData.filter((plan) => Number(plan.price) !== 0.01 && plan.id !== "test");
 
-        // Always show all plans
-        setPlans(basePlans);
+        const fallbackIds = ["three-days", "seven-days", "fifteen-days", "monthly"];
+        const isBackendResponse =
+          plansData?.length && plansData[0].id && !fallbackIds.includes(plansData[0].id);
+        const normalized = isBackendResponse ? normalizePlans(plansData) : plansData;
+        setPlans(normalized?.length ? normalized : FALLBACK_PLANS);
       } catch (err) {
         console.error("[PlansPage] Erro ao carregar planos:", err);
         setPlans(FALLBACK_PLANS);
       } finally {
         setLoading(false);
       }
-    })();
+    }
+
+    Promise.resolve().then(loadPlans);
   }, []);
 
   const handlePaymentStart = () => {
@@ -132,15 +123,12 @@ export function PlansPage() {
   };
 
   const handlePlanClick = (planId) => {
-    console.log("[PlansPage] Clique:", { planId, isAuthenticated, selectedPlanId });
     if (!isAuthenticated) {
-      console.log("[PlansPage] Não autenticado, redirecionando para login");
-      showToast("Faca login para contratar um plano.");
+      showToast("Faça login para contratar um plano.");
       navigate("/login", { state: { from: "/planos" } });
       return;
     }
 
-    console.log("[PlansPage] Definindo selectedPlanId para:", planId);
     setSelectedPlanId(planId);
   };
 
@@ -163,18 +151,14 @@ export function PlansPage() {
           <div>
             <h1 id="plans-title">Escolha o tempo de visibilidade</h1>
             <p>
-              Seus grupos aparecem no bloco de destaque pelo periodo contratado,
+              Seus grupos aparecem no bloco de destaque pelo período contratado,
               com acesso direto para novos visitantes.
             </p>
-            {isAuthenticated && userGroups.length > 0 && (
-              <p style={{ marginTop: "12px", fontSize: "0.95em", color: "#666" }}>
-                📌 Planos disponíveis para seus grupos
-              </p>
+            {isAuthenticated && !loadingGroups && userGroups.length > 0 && (
+              <p className="plans-heading__hint">Planos disponíveis para seus grupos</p>
             )}
-            {isAuthenticated && userGroups.length === 0 && (
-              <p style={{ marginTop: "12px", fontSize: "0.95em", color: "#666" }}>
-                💡 Crie um grupo primeiro para ver planos personalizados
-              </p>
+            {isAuthenticated && !loadingGroups && userGroups.length === 0 && (
+              <p className="plans-heading__hint">Crie um grupo primeiro para ver planos personalizados</p>
             )}
           </div>
         </div>
@@ -183,13 +167,10 @@ export function PlansPage() {
           {(plans || []).map((plan) => {
             const discountPercent = getDiscountPercent(plan);
             const savings = getSavings(plan);
-
             return (
               <article
                 key={plan.id}
-                className={`plan-card ${plan.popular ? "plan-card--popular" : ""} ${
-                  plan.id === "test" ? "plan-card--test" : ""
-                }`}
+                className={`plan-card ${plan.popular ? "plan-card--popular" : ""}`}
               >
                 <div className="plan-card__top">
                   <span className="plan-card__icon" aria-hidden="true">
@@ -200,26 +181,19 @@ export function PlansPage() {
                     {discountPercent && (
                       <span className="plan-badge plan-badge--deal">{discountPercent}% OFF</span>
                     )}
-                    {plan.id === "test" && (
-                      <span className="plan-badge plan-badge--test">Teste</span>
-                    )}
                   </div>
                 </div>
 
-                <div className="plan-card__name">{plan.name}</div>
+                <h2 className="plan-card__name">{plan.name}</h2>
 
                 <div className="plan-card__price-block">
                   {plan.originalPrice && (
-                    <div className="plan-card__price-old">
-                      De {formatPrice(plan.originalPrice)}
-                    </div>
+                    <div className="plan-card__price-old">De {formatPrice(plan.originalPrice)}</div>
                   )}
                   <div className="plan-card__price">{formatPrice(plan.price)}</div>
                   <div className="plan-card__period">por {plan.period}</div>
                   {savings && (
-                    <span className="plan-card__savings">
-                      Economize {formatPrice(savings)}
-                    </span>
+                    <span className="plan-card__savings">Economize {formatPrice(savings)}</span>
                   )}
                   {plan.isOffer && plan.offerText && (
                     <span className="plan-card__note">{plan.offerText}</span>
@@ -229,8 +203,8 @@ export function PlansPage() {
                 <p className="plan-card__desc">{plan.description}</p>
 
                 <ul className="plan-card__features">
-                  {(plan.features || []).map((feature, idx) => (
-                    <li key={idx}>
+                  {(plan.features || []).map((feature) => (
+                    <li key={feature}>
                       <span aria-hidden="true">✓</span>
                       {feature}
                     </li>
@@ -242,9 +216,7 @@ export function PlansPage() {
                 ) : (
                   <button
                     type="button"
-                    className={`plan-card__button ${
-                      plan.popular ? "plan-card__button--solid" : ""
-                    } ${plan.id === "test" ? "plan-card__button--test" : ""}`}
+                    className={`plan-card__button ${plan.popular ? "plan-card__button--solid" : ""}`}
                     onClick={() => handlePlanClick(plan.id)}
                   >
                     Contratar {plan.name}

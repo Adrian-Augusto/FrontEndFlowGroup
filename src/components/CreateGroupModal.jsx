@@ -1,8 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { CATEGORIES_SECTIONS } from "../constants/categories";
-import { groupsApi } from "../api/groupsApi";
 import { GROUP_PLATFORMS } from "../data/platforms";
-import { DEFAULT_PHOTO } from "../data/groups";
 import "./CreateGroupModal.css";
 
 export function CreateGroupModal({ isOpen, onClose, onSubmit }) {
@@ -195,9 +193,9 @@ export function CreateGroupModal({ isOpen, onClose, onSubmit }) {
               onChange={handlePhotoChange}
             />
             <p className="modal__hint">Imagem (JPG, PNG, WebP) - Obrigatório</p>
-            {(preview || DEFAULT_PHOTO) && (
+            {preview && (
               <img
-                src={preview ?? DEFAULT_PHOTO}
+                src={preview}
                 alt="Prévia da capa"
                 className="modal__photo-preview"
               />

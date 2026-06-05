@@ -12,14 +12,13 @@ import "./ProfilePage.css";
 
 function normalizePlans(apiPlans) {
   const fallbackMap = {
-    0.01: FALLBACK_PLANS[4], // test
     12.9: FALLBACK_PLANS[0], // 3 dias
     24.9: FALLBACK_PLANS[1], // 7 dias
     39.9: FALLBACK_PLANS[2], // 15 dias
     49.9: FALLBACK_PLANS[3], // 30 dias
   };
 
-  return apiPlans.map((plan) => {
+  return apiPlans.filter((plan) => Number(plan.price) !== 0.01 && plan.id !== "test").map((plan) => {
     const priceVal = Number(plan.price);
     const fallback = fallbackMap[priceVal] || FALLBACK_PLANS[0];
     return {

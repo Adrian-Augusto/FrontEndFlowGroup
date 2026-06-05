@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../api/client";
-import { useGroups } from "../context/GroupsContext";
+import { adminApi } from "../api/adminApi";
 import { useToast } from "../components/Toast";
 import { PlatformBadge } from "../components/PlatformBadge";
 import { GROUP_STATUS } from "../data/groups";
@@ -12,21 +11,44 @@ function formatNumber(n) {
 }
 
 export function AdminPage() {
-  const { groups, approveGroup, rejectGroup, deleteGroup, loading: groupsLoading, refresh } = useGroups();
   const { showToast } = useToast();
+  const [groups, setGroups] = useState([]);
+  const [groupsLoading, setGroupsLoading] = useState(true);
+  const [apiError, setApiError] = useState(null);
   const [stats, setStats] = useState(null);
   const [statusFilter, setStatusFilter] = useState(GROUP_STATUS.PENDING);
   const [actionId, setActionId] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const loadStats = useCallback(async () => {
-    const { data } = await api.getAdminStats();
+    const data = await adminApi.getStats();
     setStats(data);
   }, []);
 
+  const loadGroups = useCallback(async () => {
+    setGroupsLoading(true);
+    setApiError(null);
+    try {
+      const data = await adminApi.listGroups({ status: statusFilter });
+      setGroups(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setGroups([]);
+      setApiError(err?.message ?? "Erro ao carregar grupos do admin.");
+    } finally {
+      setGroupsLoading(false);
+    }
+  }, [statusFilter]);
+
   useEffect(() => {
-    loadStats();
-  }, [loadStats, groups]);
+    Promise.resolve().then(loadStats).catch((err) => {
+      setStats(null);
+      setApiError(err?.message ?? "Erro ao carregar estatísticas do admin.");
+    });
+  }, [loadStats]);
+
+  useEffect(() => {
+    Promise.resolve().then(loadGroups);
+  }, [loadGroups]);
 
   const filtered = useMemo(
     () => groups.filter((g) => g.status === statusFilter),
@@ -36,10 +58,10 @@ export function AdminPage() {
   const handleApprove = async (id, title) => {
     setActionId(id);
     try {
-      await approveGroup(id);
+      await adminApi.approve(id);
       showToast(`“${title}” aprovado — link liberado na vitrine.`);
       await loadStats();
-      await refresh();
+      await loadGroups();
     } finally {
       setActionId(null);
     }
@@ -50,10 +72,10 @@ export function AdminPage() {
     if (reason === null) return;
     setActionId(id);
     try {
-      await rejectGroup(id, reason);
+      await adminApi.reject(id, reason);
       showToast(`“${title}” rejeitado.`);
       await loadStats();
-      await refresh();
+      await loadGroups();
     } finally {
       setActionId(null);
     }
@@ -61,11 +83,11 @@ export function AdminPage() {
   const handleDelete = async (id, title) => {
     setActionId(id);
     try {
-      await deleteGroup(id);
+      await adminApi.delete(id);
       showToast(`"${title}" deletado permanentemente.`);
       setDeleteConfirm(null);
       await loadStats();
-      await refresh();
+      await loadGroups();
     } finally {
       setActionId(null);
     }
@@ -102,6 +124,21 @@ export function AdminPage() {
             </p>
           </div>
         </header>
+
+        {apiError && (
+          <div className="admin__api-error" role="alert">
+            <span>{apiError}</span>
+            <button
+              type="button"
+              onClick={() => {
+                loadStats();
+                loadGroups();
+              }}
+            >
+              Tentar novamente
+            </button>
+          </div>
+        )}
 
         {stats && (
           <div className="admin__stats">

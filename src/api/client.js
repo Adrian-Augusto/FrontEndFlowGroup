@@ -155,8 +155,10 @@ export const api = {
     }
     await delay();
     const { data: user } = await api.getGoogleProfile();
-    let photo = DEFAULT_PHOTO;
-    if (payload.photoFile) photo = await fileToDataUrl(payload.photoFile);
+    if (!(payload.photoFile instanceof File) || payload.photoFile.size === 0) {
+      throw new Error("Foto é obrigatória");
+    }
+    const photo = await fileToDataUrl(payload.photoFile);
     const groups = loadGroups();
     const newGroup = normalizeGroup({
       id: `g${Date.now().toString(36)}`,
