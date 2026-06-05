@@ -48,7 +48,6 @@ export const plansApi = {
     
     // Mapeamento de UUID do backend para o ID local do frontend
     const uuidMap = {
-      "e1042858-a403-4524-90ef-46d5d7a3670c": "test",
       "9c9fde4e-5115-46d4-b724-13aa9652520e": "three-days",
       "4562be0f-3d64-4b73-a4e6-0301bc7636e7": "seven-days",
       "abfdd079-7706-4efc-8b3b-5ebe10299657": "fifteen-days",

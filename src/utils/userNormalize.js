@@ -1,3 +1,5 @@
+import { getApiOrigin } from "../api/routes";
+
 /**
  * Validates and sanitizes avatar URLs to prevent XSS attacks
  * Only allows:
@@ -19,14 +21,22 @@ function sanitizeAvatarUrl(url) {
   if (trimmed.startsWith("/uploads/")) {
     // Ensure no path traversal attempts
     if (trimmed.includes("..")) return null;
-    return trimmed;
+    return `${getApiOrigin().replace(/\/$/, "")}${trimmed}`;
   }
 
   // Allow HTTPS URLs from known safe domains
   try {
     const urlObj = new URL(trimmed);
-    
-    // Must be HTTPS
+    const apiUrl = new URL(getApiOrigin());
+    if (
+      urlObj.origin === apiUrl.origin &&
+      urlObj.pathname.startsWith("/uploads/") &&
+      !urlObj.pathname.includes("..")
+    ) {
+      return trimmed;
+    }
+
+    // External avatar URLs must be HTTPS
     if (urlObj.protocol !== "https:") return null;
 
     // Whitelist of trusted domains for avatars
@@ -107,13 +117,18 @@ export function normalizeUser(data) {
     rawUser.avatar ??
     rawUser.picture ??
     rawUser.pictureUrl ??
+    rawUser.picture_url ??
     rawUser.photo ??
     rawUser.photoUrl ??
+    rawUser.profilePicture ??
+    rawUser.profile_picture ??
+    rawUser.image ??
     rawUser.imageUrl ??
+    rawUser.image_url ??
     null;
 
-  // Normalize /uploads paths
-  if (avatarUrl && typeof avatarUrl === "string" && avatarUrl.includes("/uploads/")) {
+  // Normalize uploaded image paths without losing the backend origin.
+  if (avatarUrl && typeof avatarUrl === "string" && !avatarUrl.startsWith("http") && avatarUrl.includes("/uploads/")) {
     const parts = avatarUrl.split("/uploads/");
     avatarUrl = "/uploads/" + parts[parts.length - 1];
   }

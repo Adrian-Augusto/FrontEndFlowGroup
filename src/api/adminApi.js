@@ -4,7 +4,7 @@ import { GROUP_STATUS, INITIAL_GROUPS } from "../data/groups";
 import { PLATFORM_STATS } from "../data/platform";
 import { normalizeGroups } from "../utils/groupNormalize";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 const STORAGE_GROUPS = "octo_groups_v4";
 
 function delay(ms = 200) {

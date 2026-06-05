@@ -116,11 +116,6 @@
   background: var(--color-purple-600);
 }
 
-.plan-card--test {
-  border-style: dashed;
-  background: rgba(255, 255, 255, 0.72);
-}
-
 .plan-card__top {
   min-height: 42px;
   display: flex;
@@ -161,12 +156,6 @@
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
-}
-
-.plan-badge--test {
-  border: 1px solid var(--color-purple-200);
-  background: var(--color-purple-50);
-  color: var(--color-purple-700);
 }
 
 .plan-badge--deal {
@@ -318,16 +307,6 @@
 .plan-card__button--solid:hover {
   background: var(--color-purple-700);
   border-color: var(--color-purple-700);
-}
-
-.plan-card__button--test {
-  border-color: var(--color-purple-200);
-  color: var(--color-purple-600);
-}
-
-.plan-card__button--test:hover {
-  background: var(--color-purple-50);
-  color: var(--color-purple-800);
 }
 
 @media (max-width: 1180px) {

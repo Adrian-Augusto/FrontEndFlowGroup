@@ -1,14 +1,21 @@
 import { API_ROUTES } from "./routes";
 import { apiRequest } from "./axiosClient";
-import { GROUP_STATUS, INITIAL_GROUPS, DEFAULT_PHOTO } from "../data/groups";
+import { GROUP_STATUS, INITIAL_GROUPS } from "../data/groups";
 import { normalizeGroups, normalizeGroup } from "../utils/groupNormalize";
 import { filterMyGroups } from "../utils/matchGroupOwner";
-import { fileToDataUrl } from "../utils/fileToDataUrl";
 import { authService } from "../auth/authService";
 import { uploadApi } from "./uploadApi";
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 const STORAGE_KEY = "octo_groups_v5";
+
+if (!USE_MOCK && typeof localStorage !== "undefined") {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
 
 function delay(ms = 200) {
   return new Promise((r) => setTimeout(r, ms));
@@ -25,7 +32,11 @@ function loadMock() {
 }
 
 function saveMock(groups) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
+  } catch (err) {
+    console.warn("[groupsApi] Não foi possível salvar grupos mock no localStorage:", err);
+  }
 }
 
 function unwrapList(data) {
@@ -38,7 +49,7 @@ async function request(path, options) {
     return await apiRequest(path, options);
   } catch (err) {
     const msg = err.response?.data?.message ?? err.message ?? "Erro de rede";
-    throw new Error(msg);
+    throw new Error(msg, { cause: err });
   }
 }
 
@@ -151,12 +162,7 @@ export const groupsApi = {
       throw new Error("Foto é obrigatória");
     }
 
-    let photo;
-    try {
-      photo = await fileToDataUrl(photoFile);
-    } catch (err) {
-      throw new Error("Erro ao preparar a foto", { cause: err });
-    }
+    const photo = "";
     
     const created = normalizeGroup({
       id: `g${Date.now().toString(36)}`,
@@ -213,7 +219,7 @@ export const groupsApi = {
     }
   },
 
-  async update(id, { name, description, categoryId, title, link, platform, photoFile, photoUrl, ...rest }) {
+  async update(id, { name, description, categoryId, title, link, platform, photoFile, photoUrl }) {
     const nameValue = name || title;
 
     if (!USE_MOCK) {
@@ -224,7 +230,7 @@ export const groupsApi = {
           finalPhotoUrl = await uploadApi.uploadGroupPhoto(photoFile);
         } catch (err) {
           console.error("[groupsApi] Erro ao fazer upload da foto no update:", err);
-          throw new Error(err.message || "Erro ao fazer upload da foto");
+          throw new Error(err.message || "Erro ao fazer upload da foto", { cause: err });
         }
       }
 
@@ -252,11 +258,7 @@ export const groupsApi = {
 
     let photo = photoUrl || group.photo;
     if (photoFile instanceof File && photoFile.size > 0) {
-      try {
-        photo = await fileToDataUrl(photoFile);
-      } catch (err) {
-        // ignore
-      }
+      photo = "";
     }
 
     group.title = nameValue ?? group.title;
@@ -291,7 +293,7 @@ export const groupsApi = {
         });
         return data;
       } catch (err) {
-        throw new Error(err?.response?.data?.message ?? err.message ?? "Erro ao patrocinar grupo");
+        throw new Error(err?.response?.data?.message ?? err.message ?? "Erro ao patrocinar grupo", { cause: err });
       }
     }
 

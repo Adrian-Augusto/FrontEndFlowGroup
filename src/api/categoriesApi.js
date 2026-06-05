@@ -3,14 +3,14 @@ import { API_ROUTES } from "./routes";
 
 const MOCK_CATEGORIES = [];
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
 async function request(path, options = {}) {
   try {
     return await apiRequest(path, options);
   } catch (err) {
     const msg = err.response?.data?.message ?? err.message ?? "Erro de rede";
-    throw new Error(msg);
+    throw new Error(msg, { cause: err });
   }
 }
 
