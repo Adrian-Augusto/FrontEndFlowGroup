@@ -95,18 +95,13 @@ export function Header() {
             </NavLink>
             {isAuthenticated && (
               <>
-                <NavLink to="/groups/create" className="header__link header__link--publish" onClick={closeMobileMenu}>
-                  + Publicar
-                </NavLink>
                 <NavLink to="/meus-grupos" className="header__link header__link--muted" onClick={closeMobileMenu}>
                   Meus grupos
                 </NavLink>
+                <NavLink to="/perfil" className="header__link header__link--muted" onClick={closeMobileMenu}>
+                  Perfil
+                </NavLink>
               </>
-            )}
-            {isAuthenticated && (
-              <NavLink to="/perfil" className="header__link header__link--muted" onClick={closeMobileMenu}>
-                Perfil
-              </NavLink>
             )}
             {isAdmin && (
               <NavLink to="/admin" className="header__link header__link--admin" onClick={closeMobileMenu}>
