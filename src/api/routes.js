@@ -35,6 +35,10 @@ export const API_ROUTES = {
     feature: (id) => apiPath("groups", id, "feature"),
     join: (id) => apiPath("groups", id, "join"),
   },
+  subscriptions: {
+    me: apiPath("subscriptions", "me"),
+    limits: apiPath("subscriptions", "limits"),
+  },
   upload: {
     groupPhoto: apiPath("upload", "group-photo"),
   },

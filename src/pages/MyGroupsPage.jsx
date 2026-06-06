@@ -162,12 +162,12 @@ export function MyGroupsPage() {
               Impulsionar meus grupos
             </h2>
             <p className="my-groups__sponsorship-description">
-              Use seus créditos para colocar grupos aprovados em posições de maior visibilidade.
+              Escolha um plano para destacar seus grupos aprovados em posições de maior visibilidade.
             </p>
             <div className="my-groups__sponsorship-stats">
-              <span>Créditos disponíveis:</span>
+              <span>Grupos patrocinados:</span>
               <strong>
-                {sponsorshipLimits.sponsoredGroups?.remaining || 0}
+                {activeGroups}/{maxGroups}
               </strong>
             </div>
           </div>
