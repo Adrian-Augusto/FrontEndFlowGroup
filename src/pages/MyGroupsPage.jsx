@@ -154,35 +154,6 @@ export function MyGroupsPage() {
         </Link>
       </header>
 
-      {/* Widget de impulsionamentos */}
-      {sponsorshipLimits && (
-        <div className="my-groups__sponsorship-card">
-          <div className="my-groups__sponsorship-info">
-            <h2 className="my-groups__sponsorship-title">
-              Impulsionar meus grupos
-            </h2>
-            <p className="my-groups__sponsorship-description">
-              Escolha um plano para destacar seus grupos aprovados em posições de maior visibilidade.
-            </p>
-            <div className="my-groups__sponsorship-stats">
-              <span>Grupos patrocinados:</span>
-              <strong>
-                {activeGroups}/{maxGroups}
-              </strong>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="my-groups__sponsorship-action"
-            onClick={() => handleOpenTurbinarModal()}
-            disabled={!canSponsorMore}
-          >
-            Impulsionar grupo
-          </button>
-        </div>
-      )}
-
       <div className="my-groups__tabs" role="tablist">
         {TABS.map((t) => {
           const count =
@@ -245,27 +216,19 @@ export function MyGroupsPage() {
                 </button>
                 <button
                   type="button"
+                  className="my-groups__action-btn my-groups__action-btn--sponsor"
+                  onClick={() => handleOpenTurbinarModal(g.id)}
+                  disabled={g.featured}
+                >
+                  {g.featured ? "✓ Impulsionado" : "🚀 Impulsionar"}
+                </button>
+                <button
+                  type="button"
                   className="my-groups__action-btn my-groups__action-btn--delete"
                   onClick={() => handleDeleteClick(g)}
                 >
                   🗑️ Excluir
                 </button>
-                {g.status === "APPROVED" && (
-                  g.featured ? (
-                    <span className="my-groups__turbinado-badge" title="Este grupo já está impulsionado e aparece em posições de maior visibilidade.">
-                      Impulsionado
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      className="my-groups__turbinar-btn"
-                      onClick={() => handleOpenTurbinarModal(g.id)}
-                      disabled={!canSponsorMore}
-                    >
-                      Impulsionar grupo
-                    </button>
-                  )
-                )}
               </div>
             </li>
           ))}
