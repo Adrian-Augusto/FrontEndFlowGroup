@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { plansApi } from "../api/plansApi";
 import { groupsApi } from "../api/groupsApi";
 import { PLANS as FALLBACK_PLANS } from "../data/plans";
@@ -53,11 +53,16 @@ export function PlansPage() {
   const userId = user?.id;
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [plans, setPlans] = useState(FALLBACK_PLANS);
   const [loading, setLoading] = useState(false);
   const [userGroups, setUserGroups] = useState([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
+  
+  // Receber dados do grupo do state (quando vem do modal de impulsionar)
+  const sponsorGroupId = location.state?.groupId;
+  const sponsorGroup = location.state?.group;
 
   const loadUserGroups = useCallback(async () => {
     if (!userId) return;
@@ -212,7 +217,7 @@ export function PlansPage() {
                 </ul>
 
                 {selectedPlanId === plan.id && isAuthenticated ? (
-                  <PaymentButton plan={plan} onPaymentStart={handlePaymentStart} />
+                  <PaymentButton plan={plan} groupId={sponsorGroupId} onPaymentStart={handlePaymentStart} />
                 ) : (
                   <button
                     type="button"

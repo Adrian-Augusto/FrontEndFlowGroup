@@ -11,7 +11,7 @@ export function usePayment() {
   const [error, setError] = useState(null);
   const { user } = useAuth();
 
-  const createPayment = useCallback(async (planId) => {
+  const createPayment = useCallback(async (planId, groupId = null) => {
     setLoading(true);
     setError(null);
 
@@ -21,8 +21,7 @@ export function usePayment() {
       }
 
       const userId = user?.id;
-      // groupId não é necessário - plano premium para TODOS os grupos
-      const response = await paymentsApi.createPayment(planId, userId);
+      const response = await paymentsApi.createPayment(planId, userId, groupId);
 
       // Redirect seguro para Mercado Pago
       if (response.init_point) {

@@ -5,7 +5,7 @@ import "./PaymentButton.css";
  * Botão de pagamento para planos premium.
  * Destaca todos os grupos do usuário pelo período do plano.
  */
-export function PaymentButton({ plan, disabled = false, onPaymentStart }) {
+export function PaymentButton({ plan, groupId = null, disabled = false, onPaymentStart }) {
   const { loading, error, createPayment, clearError } = usePayment();
 
   const isDisabled = disabled || loading;
@@ -13,7 +13,7 @@ export function PaymentButton({ plan, disabled = false, onPaymentStart }) {
   const handleClick = async () => {
     clearError();
     onPaymentStart?.();
-    await createPayment(plan.id);
+    await createPayment(plan.id, groupId);
   };
 
   return (

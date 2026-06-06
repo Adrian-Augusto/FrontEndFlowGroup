@@ -1,29 +1,14 @@
 import { useEffect, useId, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { groupsApi } from "../api/groupsApi";
 import "./SponsorGroupModal.css";
 
 export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroups = [], initialGroupId = null }) {
   const titleId = useId();
+  const navigate = useNavigate();
   const [selectedGroupId, setSelectedGroupId] = useState(initialGroupId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [sponsorshipLimits, setSponsorshipLimits] = useState(null);
-
-  const loadSponsorshipLimits = async () => {
-    try {
-      const data = await groupsApi.getSponsorshipLimits();
-      if (data?.data) {
-        setSponsorshipLimits(data.data);
-      } else if (data) {
-        setSponsorshipLimits(data);
-      } else {
-        setSponsorshipLimits(null);
-      }
-    } catch (err) {
-      console.error("Erro ao carregar limites:", err);
-      setSponsorshipLimits(null);
-    }
-  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -31,7 +16,6 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
     const init = async () => {
       await Promise.resolve();
       setSelectedGroupId(initialGroupId);
-      loadSponsorshipLimits();
     };
     init();
   }, [isOpen, initialGroupId]);
@@ -40,35 +24,22 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
     if (e.target === e.currentTarget) onClose();
   };
 
-  const handleSponsor = async () => {
+  const handleSponsor = () => {
     if (!selectedGroupId) {
       setError("Selecione um grupo para impulsionar");
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      await groupsApi.sponsorGroup(selectedGroupId);
-      setSelectedGroupId(null);
-      onSponsorSuccess?.();
-      onClose();
-    } catch (err) {
-      setError(err?.message ?? "Erro ao impulsionar grupo");
-    } finally {
-      setLoading(false);
-    }
+    // Redirecionar para página de planos com dados do grupo
+    const selectedGroup = userGroups.find(g => g.id === selectedGroupId);
+    onClose();
+    navigate("/planos", { state: { groupId: selectedGroupId, group: selectedGroup } });
   };
 
   if (!isOpen) return null;
 
   // Filter groups that are not already sponsored
   const sponsorableGroups = userGroups.filter((g) => !g.featured && g.status === "approved");
-
-  const canSponsorMore =
-    sponsorshipLimits?.canSponsor &&
-    sponsorshipLimits?.sponsoredGroups?.active < sponsorshipLimits?.sponsoredGroups?.max;
 
   return (
     <div className="modal-backdrop" role="presentation" onClick={handleBackdropClick}>
@@ -85,34 +56,6 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
         </header>
 
         <div className="modal__content">
-          {sponsorshipLimits && (
-            <div className="sponsor-modal__info">
-              <div className="sponsor-modal__limits">
-                <p>
-                  <strong>Espaço disponível:</strong>{" "}
-                  {sponsorshipLimits.sponsoredGroups.max - sponsorshipLimits.sponsoredGroups.active} de{" "}
-                  {sponsorshipLimits.sponsoredGroups.max}
-                </p>
-                <div className="sponsor-modal__progress-bar">
-                  {Array.from({ length: sponsorshipLimits.sponsoredGroups.max }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={`sponsor-modal__slot ${
-                        i < sponsorshipLimits.sponsoredGroups.active ? "sponsor-modal__slot--filled" : ""
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!canSponsorMore && sponsorshipLimits && (
-            <div className="modal__alert modal__alert--warning">
-              <span>⚠️ Você atingiu o limite de impulsionamentos. Atualize seu plano para impulsionar mais grupos.</span>
-            </div>
-          )}
-
           {sponsorableGroups.length === 0 ? (
             <div className="sponsor-modal__empty">
               <p>
@@ -158,9 +101,9 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
             type="button"
             className="modal__btn modal__btn--primary"
             onClick={handleSponsor}
-            disabled={loading || !canSponsorMore || sponsorableGroups.length === 0}
+            disabled={loading || !selectedGroupId || sponsorableGroups.length === 0}
           >
-            {loading ? "Impulsionando..." : "Impulsionar"}
+            {loading ? "Processando..." : "Ver planos"}
           </button>
         </footer>
       </div>

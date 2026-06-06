@@ -16,28 +16,30 @@ function generateIdempotencyKey(userId) {
 export const paymentsApi = {
   /**
    * POST /api/v1/payments/create
-   * Cria um pagamento premium para destaque de todos os grupos do usuário
+   * Cria um pagamento para impulsionar um grupo específico
    *
    * Esperado pelo backend:
    * {
    *   "planId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+   *   "groupId": "grupo-uuid",
    *   "idempotencyKey": "user-123-1234567890"
    * }
    */
-  async createPayment(planId, userId = null) {
+  async createPayment(planId, userId = null, groupId = null) {
     if (!planId) throw new Error("planId é obrigatório");
 
     try {
       // Gerar chave de idempotência
       const idempotencyKey = generateIdempotencyKey(userId || "unknown");
 
-      // Preparar payload - SEM groupId (plano premium para TODOS os grupos)
+      // Preparar payload - INCLUI groupId para impulsionar grupo específico
       const payload = {
         planId,
+        groupId,
         idempotencyKey,
       };
 
-      console.log("[Payment API] Enviando payload para destaque premium:", payload);
+      console.log("[Payment API] Enviando payload para impulsionar grupo:", payload);
 
       const response = await apiRequest(API_ROUTES.payments.create, {
         method: "POST",

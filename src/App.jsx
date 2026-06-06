@@ -7,6 +7,7 @@ import { ToastProvider } from "./components/Toast";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminRoute } from "./components/AdminRoute";
 import { AppLayout } from "./layouts/AppLayout";
+import { WhatsAppFloat } from "./components/WhatsAppFloat";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
@@ -70,6 +71,7 @@ export default function App() {
             </SubscriptionProvider>
           </AuthProvider>
         </ToastProvider>
+        <WhatsAppFloat />
       </BrowserRouter>
     </ErrorBoundary>
   );
