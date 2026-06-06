@@ -12,10 +12,10 @@ import "./ProfilePage.css";
 
 function normalizePlans(apiPlans) {
   const fallbackMap = {
-    12.9: FALLBACK_PLANS[0], // 3 dias
-    24.9: FALLBACK_PLANS[1], // 7 dias
-    39.9: FALLBACK_PLANS[2], // 15 dias
-    49.9: FALLBACK_PLANS[3], // 30 dias
+    9.9: FALLBACK_PLANS[0], // 3 dias sponsored
+    19.9: FALLBACK_PLANS[1], // 7 dias sponsored
+    29.9: FALLBACK_PLANS[2], // 15 dias premium
+    49.9: FALLBACK_PLANS[3], // 30 dias premium
   };
 
   return apiPlans.filter((plan) => Number(plan.price) !== 0.01 && plan.id !== "test").map((plan) => {

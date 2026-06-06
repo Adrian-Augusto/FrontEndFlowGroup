@@ -27,9 +27,9 @@ function getSavings(plan) {
 
 function normalizePlans(apiPlans) {
   const fallbackByPrice = new Map([
-    [12.9, FALLBACK_PLANS[0]],
-    [24.9, FALLBACK_PLANS[1]],
-    [39.9, FALLBACK_PLANS[2]],
+    [9.9, FALLBACK_PLANS[0]],
+    [19.9, FALLBACK_PLANS[1]],
+    [29.9, FALLBACK_PLANS[2]],
     [49.9, FALLBACK_PLANS[3]],
   ]);
 
