@@ -54,9 +54,13 @@ export function GroupCard({ group, showStatus = false, showFeaturedBadge = false
           loading="lazy"
           crossOrigin="anonymous"
           onError={(e) => {
+            console.error("[GroupCard] Erro ao carregar foto:", group.photo);
             e.currentTarget.src =
               "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=240&fit=crop";
             e.currentTarget.crossOrigin = "anonymous";
+          }}
+          onLoad={(e) => {
+            console.log("[GroupCard] Foto carregada com sucesso:", group.photo?.substring(0, 50) + "...");
           }}
         />
         <div className="group-card__cover-overlay">

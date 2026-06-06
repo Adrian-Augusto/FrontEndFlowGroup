@@ -4,7 +4,7 @@ import { GROUP_STATUS, INITIAL_GROUPS } from "../data/groups";
 import { normalizeGroups, normalizeGroup } from "../utils/groupNormalize";
 import { filterMyGroups } from "../utils/matchGroupOwner";
 import { authService } from "../auth/authService";
-import { fileToDataUrl } from "../utils/fileToDataUrl";
+import { uploadApi } from "./uploadApi";
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 const STORAGE_KEY = "octo_groups_v5";
@@ -94,34 +94,30 @@ export const groupsApi = {
         throw new Error("Usuário não autenticado");
       }
 
-      // Validar e converter foto para base64
+      // Upload photo using multipart/form-data
       if (!(photoFile instanceof File) || photoFile.size === 0) {
         throw new Error("Foto é obrigatória");
       }
 
-      // Validar tamanho do arquivo (5MB)
-      const MAX_FILE_SIZE = 5 * 1024 * 1024;
-      if (photoFile.size > MAX_FILE_SIZE) {
-        const sizeInMB = (photoFile.size / (1024 * 1024)).toFixed(2);
-        throw new Error(`A foto não pode exceder 5MB. Arquivo selecionado: ${sizeInMB}MB`);
-      }
-
       let photoUrl;
-      try {
-        console.log("[groupsApi] Convertendo foto para base64:", photoFile.name);
-        photoUrl = await fileToDataUrl(photoFile);
-        console.log("[groupsApi] Foto convertida para base64:", {
-          hasData: !!photoUrl,
-          isString: typeof photoUrl === "string",
-          length: photoUrl?.length,
-          startsWithData: photoUrl?.startsWith("data:image/")
-        });
-        if (!photoUrl || !photoUrl.startsWith("data:image/")) {
-          throw new Error("Erro ao converter foto para base64");
+      if (photoFile instanceof File && photoFile.size > 0) {
+        try {
+          console.log("[groupsApi] Tentando upload de foto:", photoFile.name);
+          photoUrl = await uploadApi.uploadGroupPhoto(photoFile);
+          console.log("[groupsApi] Upload retornou:", {
+            hasUrl: !!photoUrl,
+            isString: typeof photoUrl === "string",
+            urlLength: photoUrl?.length
+          });
+          if (!photoUrl) {
+            console.warn("[groupsApi] Upload retornou URL vazia");
+            throw new Error("Upload da foto não retornou uma URL válida");
+          }
+        } catch (err) {
+          console.error("[groupsApi] Erro ao fazer upload da foto:", err);
+          // Propagar o erro para que a UI possa exibir mensagem adequada
+          throw new Error(err.message || "Erro ao fazer upload da foto", { cause: err });
         }
-      } catch (err) {
-        console.error("[groupsApi] Erro ao converter foto:", err);
-        throw new Error("Erro ao processar a foto", { cause: err });
       }
 
       const payload = {
@@ -229,27 +225,12 @@ export const groupsApi = {
     if (!USE_MOCK) {
       let finalPhotoUrl = photoUrl;
       if (photoFile instanceof File && photoFile.size > 0) {
-        // Validar tamanho do arquivo (5MB)
-        const MAX_FILE_SIZE = 5 * 1024 * 1024;
-        if (photoFile.size > MAX_FILE_SIZE) {
-          const sizeInMB = (photoFile.size / (1024 * 1024)).toFixed(2);
-          throw new Error(`A foto não pode exceder 5MB. Arquivo selecionado: ${sizeInMB}MB`);
-        }
-
         try {
-          console.log("[groupsApi] Convertendo foto para base64 no update:", photoFile.name);
-          finalPhotoUrl = await fileToDataUrl(photoFile);
-          console.log("[groupsApi] Foto convertida para base64 no update:", {
-            hasData: !!finalPhotoUrl,
-            isString: typeof finalPhotoUrl === "string",
-            startsWithData: finalPhotoUrl?.startsWith("data:image/")
-          });
-          if (!finalPhotoUrl || !finalPhotoUrl.startsWith("data:image/")) {
-            throw new Error("Erro ao converter foto para base64");
-          }
+          console.log("[groupsApi] Tentando upload de foto no update:", photoFile.name);
+          finalPhotoUrl = await uploadApi.uploadGroupPhoto(photoFile);
         } catch (err) {
-          console.error("[groupsApi] Erro ao converter foto no update:", err);
-          throw new Error("Erro ao processar a foto", { cause: err });
+          console.error("[groupsApi] Erro ao fazer upload da foto no update:", err);
+          throw new Error(err.message || "Erro ao fazer upload da foto", { cause: err });
         }
       }
 

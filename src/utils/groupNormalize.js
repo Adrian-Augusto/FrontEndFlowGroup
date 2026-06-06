@@ -29,6 +29,9 @@ function normalizeDescription(raw) {
 function normalizePhotoUrl(url) {
   if (!url) return DEFAULT_PHOTO;
 
+  // Se já for uma data URL (base64), retorna como está
+  if (url.startsWith("data:image/")) return url;
+
   if (url.startsWith("http")) return url;
 
   if (url.startsWith("uploads/") || url.startsWith("/uploads/")) {
