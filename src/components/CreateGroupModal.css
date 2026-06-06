@@ -91,6 +91,15 @@
   width: min(100%, 480px);
 }
 
+.modal--medium {
+  width: min(100%, 520px);
+  max-height: 85vh;
+}
+
+.modal__content {
+  padding: 1.5rem;
+}
+
 .modal__hint {
   margin: 0.35rem 0 0;
   font-size: 0.75rem;

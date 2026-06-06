@@ -45,9 +45,12 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
     <div className="modal-backdrop" role="presentation" onClick={handleBackdropClick}>
       <div className="modal modal--medium" role="dialog" aria-modal="true" aria-labelledby={titleId}>
         <header className="modal__header">
-          <h2 id={titleId} className="modal__title">
-            Impulsionar grupo
-          </h2>
+          <div className="modal__header-content">
+            <div className="modal__header-icon">🚀</div>
+            <h2 id={titleId} className="modal__title">
+              Impulsionar grupo
+            </h2>
+          </div>
           <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -58,6 +61,7 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
         <div className="modal__content">
           {sponsorableGroups.length === 0 ? (
             <div className="sponsor-modal__empty">
+              <div className="sponsor-modal__empty-icon">📋</div>
               <p>
                 {userGroups.length === 0
                   ? "Você não possui nenhum grupo criado."
@@ -78,8 +82,10 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
                       onChange={(e) => setSelectedGroupId(e.target.value)}
                       disabled={loading}
                     />
-                    <span className="sponsor-modal__group-name">{group.title || group.name}</span>
-                    <span className="sponsor-modal__group-status">{group.platform}</span>
+                    <div className="sponsor-modal__group-info">
+                      <span className="sponsor-modal__group-name">{group.title || group.name}</span>
+                      <span className="sponsor-modal__group-status">{group.platform}</span>
+                    </div>
                   </label>
                 ))}
               </div>

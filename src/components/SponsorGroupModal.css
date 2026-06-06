@@ -1,8 +1,9 @@
 .sponsor-modal__info {
-  margin-bottom: 20px;
-  padding: 16px;
-  background: #f5f5f5;
-  border-radius: 8px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border-radius: 12px;
+  border: 1px solid #e9e4f2;
 }
 
 .sponsor-modal__limits {
@@ -31,78 +32,111 @@
 }
 
 .sponsor-modal__slot--filled {
-  background: #4caf50;
+  background: #8b5cf6;
 }
 
 .sponsor-modal__empty {
-  padding: 32px 16px;
+  padding: 48px 24px;
   text-align: center;
   color: #666;
 }
 
+.sponsor-modal__empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
 .sponsor-modal__empty p {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .sponsor-modal__groups {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .sponsor-modal__label {
-  margin: 0 0 8px;
-  font-weight: 500;
-  color: #333;
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: #1f1633;
+  font-size: 1rem;
 }
 
 .sponsor-modal__list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 300px;
+  gap: 12px;
+  max-height: 400px;
   overflow-y: auto;
+  padding: 4px;
 }
 
 .sponsor-modal__group-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  gap: 16px;
+  padding: 16px;
+  border: 2px solid #e9e4f2;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  background: white;
 }
 
 .sponsor-modal__group-item:hover {
-  border-color: #4caf50;
-  background: #f9f9f9;
+  border-color: #8b5cf6;
+  background: #f5f3ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
 }
 
 .sponsor-modal__group-item input[type="radio"] {
   cursor: pointer;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
+  accent-color: #8b5cf6;
 }
 
-.sponsor-modal__group-item input[type="radio"]:checked + .sponsor-modal__group-name {
+.sponsor-modal__group-item input[type="radio"]:checked + .sponsor-modal__group-info .sponsor-modal__group-name {
   font-weight: 600;
-  color: #4caf50;
+  color: #8b5cf6;
+}
+
+.sponsor-modal__group-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .sponsor-modal__group-name {
-  flex: 1;
   font-weight: 500;
-  color: #333;
+  color: #1f1633;
+  font-size: 0.95rem;
 }
 
 .sponsor-modal__group-status {
-  font-size: 0.85rem;
-  color: #999;
-  background: #f0f0f0;
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #8b5cf6;
+  background: #f5f3ff;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+}
+
+.modal__header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal__header-icon {
+  font-size: 1.5rem;
 }
