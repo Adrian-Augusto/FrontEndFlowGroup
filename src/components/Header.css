@@ -115,9 +115,17 @@
   font-weight: 600;
   font-size: 0.875rem;
   transition: background var(--transition);
+  border: none;
+  cursor: pointer;
+  display: inline-block;
 }
 
 .header__link--publish:hover {
+  background: var(--color-purple-700);
+  color: #fff;
+}
+
+.header__link--publish.active {
   background: var(--color-purple-700);
   color: #fff;
 }
