@@ -208,70 +208,7 @@ export function ProfilePage() {
               </div>
             </div>
 
-            <div className="profile-page__column profile-page__column--main">
-              <div className="profile-page__card">
-                <h3 className="profile-page__section-title">Minha Assinatura</h3>
 
-                {isActive && subscription ? (
-                  <div className="profile-page__subscription">
-                    <div className="profile-page__plan-info">
-                      <div className="profile-page__plan-header">
-                        <h4 className="profile-page__plan-name">{subscription.planName || "Plano"}</h4>
-                        <span className="profile-page__plan-badge">{subscription.status || "Ativo"}</span>
-                      </div>
-                      
-                      <dl className="profile-page__plan-details">
-                        <div className="profile-page__plan-row">
-                          <dt>Preço</dt>
-                          <dd>R$ {subscription.price ? subscription.price.toFixed(2) : "—"}</dd>
-                        </div>
-                        <div className="profile-page__plan-row">
-                          <dt>Válido até</dt>
-                          <dd>{formatDate(subscription.expiresAt)}</dd>
-                        </div>
-                        <div className="profile-page__plan-row">
-                          <dt>Início</dt>
-                          <dd>{formatDate(subscription.startedAt)}</dd>
-                        </div>
-                      </dl>
-
-                      {cancelError && (
-                        <div className="profile-page__error" role="alert">
-                          {cancelError}
-                        </div>
-                      )}
-
-                      <div className="profile-page__plan-actions">
-                        {canSponsorMore && (
-                          <button
-                            type="button"
-                            className="profile-page__sponsor-btn"
-                            onClick={() => setSponsorModalOpen(true)}
-                          >
-                            ⭐ Patrocinar Grupo
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          className="profile-page__cancel-btn"
-                          onClick={handleCancelPlan}
-                          disabled={canceling}
-                        >
-                          {canceling ? "Cancelando..." : "Cancelar assinatura"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="profile-page__no-plan">
-                    <p>Você ainda não possui uma assinatura ativa.</p>
-                    <Link to="/planos" className="profile-page__upgrade-btn">
-                      Ver assinaturas disponíveis
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
 
             {/* Seção de Assinaturas Disponíveis */}
             <div className="profile-page__card profile-page__card--plans">
