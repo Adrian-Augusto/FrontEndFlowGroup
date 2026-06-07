@@ -205,56 +205,6 @@ export function ProfilePage() {
                   </div>
                 </dl>
               </div>
-
-              {/* Seção de Assinaturas Disponíveis */}
-              <div className="profile-page__card profile-page__card--plans">
-                <h3 className="profile-page__section-title">Assinaturas Disponíveis</h3>
-                
-                {loadingPlans ? (
-                  <p className="profile-page__status">Carregando assinaturas...</p>
-                ) : availablePlans.length > 0 ? (
-                  <div className="profile-page__plans-grid">
-                    {availablePlans.map((plan) => {
-                      const isCurrentPlan =
-                        isActive && (subscription?.planId === plan.id || subscription?.planId === plan.localId);
-
-                      return (
-                        <div key={plan.id} className={`profile-page__plan-card ${isCurrentPlan ? "profile-page__plan-card--current" : ""}`}>
-                          <div className="profile-page__plan-card-header">
-                            <h4 className="profile-page__plan-card-name">{plan.name}</h4>
-                            {isCurrentPlan && <span className="profile-page__plan-card-current">Assinatura atual</span>}
-                          </div>
-
-                          <p className="profile-page__plan-card-price">R$ {plan.price.toFixed(2)}</p>
-
-                          {plan.description && (
-                            <p className="profile-page__plan-card-description">{plan.description}</p>
-                          )}
-
-                          <div className="profile-page__plan-card-duration">
-                            <small>{plan.durationDays} dias de validade</small>
-                          </div>
-
-                          {!isCurrentPlan && !isActive && (
-                            <PaymentButton
-                              plan={plan}
-                              disabled={false}
-                            />
-                          )}
-
-                          {!isCurrentPlan && isActive && (
-                            <div className="profile-page__plan-card-info">
-                              <small>Você já possui uma assinatura ativa</small>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="profile-page__status">Nenhuma assinatura disponível no momento.</p>
-                )}
-              </div>
             </div>
           </div>
         )}

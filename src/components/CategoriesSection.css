@@ -385,11 +385,13 @@
   }
 
   /* Hover para abrir sidebar */
-  .categories-container:hover .categories-sidebar:not(.open) {
+  .categories-container:hover .categories-sidebar:not(.open),
+  .categories-reopen:hover ~ .categories-sidebar:not(.open) {
     left: 0;
   }
 
-  .categories-container:hover .categories-reopen {
+  .categories-container:hover .categories-reopen,
+  .categories-reopen:hover {
     display: none;
   }
 }
