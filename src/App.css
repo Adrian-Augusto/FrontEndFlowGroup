@@ -6,13 +6,6 @@
 
 .app__main {
   flex: 1;
-  margin-right: 300px;
-}
-
-@media (max-width: 1024px) {
-  .app__main {
-    margin-right: 0;
-  }
 }
 
 .app-error {
