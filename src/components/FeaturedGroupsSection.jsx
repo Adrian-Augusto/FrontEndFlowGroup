@@ -1,14 +1,38 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { GroupCard } from "./GroupCard";
+import { apiRequest } from "../api/axiosClient";
+import { API_ROUTES } from "../api/routes";
 import "./FeaturedGroupsSection.css";
 
 /** Vitrine pública na Home para grupos patrocinados ou com plano premium ativo. */
 export function FeaturedGroupsSection({ groups }) {
+  const [featuredGroupsFromApi, setFeaturedGroupsFromApi] = useState([]);
+
+  useEffect(() => {
+    const loadFeaturedGroups = async () => {
+      try {
+        const data = await apiRequest(API_ROUTES.plans.featuredGroups);
+        const featured = data?.data || data || [];
+        setFeaturedGroupsFromApi(featured);
+      } catch (err) {
+        console.error("[FeaturedGroupsSection] Erro ao carregar grupos destacados:", err);
+      }
+    };
+    loadFeaturedGroups();
+  }, []);
+
   const featuredGroups = groups.filter(
     (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
   );
 
-  if (featuredGroups.length === 0) {
+  // Combinar grupos destacados da API com grupos locais
+  const allFeaturedGroups = [...featuredGroupsFromApi, ...featuredGroups];
+  const uniqueFeaturedGroups = allFeaturedGroups.filter((group, index, self) =>
+    index === self.findIndex((g) => g.id === group.id)
+  );
+
+  if (uniqueFeaturedGroups.length === 0) {
     return null;
   }
 
@@ -33,7 +57,7 @@ export function FeaturedGroupsSection({ groups }) {
         </header>
 
         <ul className="featured-section__grid">
-          {featuredGroups.map((group) => (
+          {uniqueFeaturedGroups.map((group) => (
             <li key={group.id}>
               <GroupCard group={group} showFeaturedBadge />
             </li>
