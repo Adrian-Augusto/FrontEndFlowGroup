@@ -11,7 +11,7 @@ export function Hero() {
         <div className="hero__content">
           <p className="hero__eyebrow">Catálogo de links</p>
           <h1 id="hero-heading" className="hero__title">
-            Plataforma para organizar e gerenciar seus grupos
+            A nova forma de construir comunidades online
           </h1>
           <p className="hero__text">
             Descubra novos grupos, organize suas comunidades e gerencie tudo em um só lugar. Simples e eficiente.
