@@ -96,8 +96,7 @@
 }
 
 .profile-page__card--plans {
-  grid-column: 1 / -1;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* User Card and Hero Details */

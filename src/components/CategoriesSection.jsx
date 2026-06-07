@@ -94,13 +94,13 @@ export function CategoriesSection({ groups = [], onCategorySelect = () => {}, se
             Categorias
           </h2>
           <button
-            className="categories-sidebar__close"
+            className="categories-sidebar__minimize"
             onClick={handleCloseSidebar}
             onMouseDown={handleCloseSidebar}
-            aria-label="Fechar menu de categorias"
+            aria-label="Minimizar menu de categorias"
             type="button"
           >
-            ✕
+            −
           </button>
         </header>
 
@@ -119,7 +119,7 @@ export function CategoriesSection({ groups = [], onCategorySelect = () => {}, se
                   {section.title}
                 </span>
                 <span className="category-section__icon" aria-hidden="true">
-                  ▼
+                  {expandedSections[section.title] ? "▲" : "▼"}
                 </span>
               </button>
 
@@ -158,7 +158,7 @@ export function CategoriesSection({ groups = [], onCategorySelect = () => {}, se
           aria-label="Abrir menu de categorias"
           type="button"
         >
-          &gt;
+          ▶
         </button>
       )}
     </section>
