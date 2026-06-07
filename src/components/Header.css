@@ -108,16 +108,17 @@
 }
 
 .header__link--publish {
-  padding: 0.35rem 0.75rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   background: var(--color-purple-600);
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.875rem;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9375rem;
   transition: background var(--transition);
   border: none;
   cursor: pointer;
   display: inline-block;
+  letter-spacing: 0.3px;
 }
 
 .header__link--publish:hover {
