@@ -77,6 +77,16 @@ export const groupsApi = {
     return filterMyGroups(loadMock(), user);
   },
 
+  /** GET /api/v1/groups/featured - Obter grupos destacados */
+  async listFeatured() {
+    if (!USE_MOCK) {
+      const data = await request(API_ROUTES.groups.featured);
+      return unwrapList(data);
+    }
+    await delay();
+    return loadMock().filter((g) => g.featured);
+  },
+
   async create({ name, description, categoryId, title, link, platform, photoFile }) {
     /**
      * Backend API expects JSON: { name, description, link, platform, photoUrl, categoryId }

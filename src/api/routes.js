@@ -27,6 +27,7 @@ export const API_ROUTES = {
   groups: {
     list: apiPath("groups"),
     mine: apiPath("groups", "me"),
+    featured: apiPath("groups", "featured"),
     limits: apiPath("subscriptions", "limits"),
     byId: (id) => apiPath("groups", id),
     create: apiPath("groups"),

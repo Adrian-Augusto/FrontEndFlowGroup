@@ -1,38 +1,31 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { GroupCard } from "./GroupCard";
-import { apiRequest } from "../api/axiosClient";
-import { API_ROUTES } from "../api/routes";
+import { groupsApi } from "../api/groupsApi";
 import "./FeaturedGroupsSection.css";
 
 /** Vitrine pública na Home para grupos patrocinados ou com plano premium ativo. */
 export function FeaturedGroupsSection({ groups }) {
-  const [featuredGroupsFromApi, setFeaturedGroupsFromApi] = useState([]);
+  const [featuredGroups, setFeaturedGroups] = useState([]);
 
   useEffect(() => {
     const loadFeaturedGroups = async () => {
       try {
-        const data = await apiRequest(API_ROUTES.plans.featuredGroups);
-        const featured = data?.data || data || [];
-        setFeaturedGroupsFromApi(featured);
+        const featured = await groupsApi.listFeatured();
+        setFeaturedGroups(featured);
       } catch (err) {
         console.error("[FeaturedGroupsSection] Erro ao carregar grupos destacados:", err);
+        // Fallback para dados locais se API falhar
+        const localFeatured = groups.filter(
+          (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
+        );
+        setFeaturedGroups(localFeatured);
       }
     };
     loadFeaturedGroups();
-  }, []);
+  }, [groups]);
 
-  const featuredGroups = groups.filter(
-    (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
-  );
-
-  // Combinar grupos destacados da API com grupos locais
-  const allFeaturedGroups = [...featuredGroupsFromApi, ...featuredGroups];
-  const uniqueFeaturedGroups = allFeaturedGroups.filter((group, index, self) =>
-    index === self.findIndex((g) => g.id === group.id)
-  );
-
-  if (uniqueFeaturedGroups.length === 0) {
+  if (featuredGroups.length === 0) {
     return null;
   }
 
@@ -57,7 +50,7 @@ export function FeaturedGroupsSection({ groups }) {
         </header>
 
         <ul className="featured-section__grid">
-          {uniqueFeaturedGroups.map((group) => (
+          {featuredGroups.map((group) => (
             <li key={group.id}>
               <GroupCard group={group} showFeaturedBadge />
             </li>
