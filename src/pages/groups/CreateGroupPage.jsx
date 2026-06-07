@@ -169,7 +169,7 @@ export function CreateGroupPage() {
         >
           <option value="">Selecione uma plataforma</option>
           {platforms.map(p => (
-            <option key={p.id} value={p.id}>{p.name}</option>
+            <option key={p.id} value={p.id}>{p.label || p.name}</option>
           ))}
         </select>
 

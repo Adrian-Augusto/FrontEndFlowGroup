@@ -195,10 +195,15 @@ export function PlansPage() {
                   {plan.originalPrice && (
                     <div className="plan-card__price-old">De {formatPrice(plan.originalPrice)}</div>
                   )}
-                  <div className="plan-card__price">{formatPrice(plan.price)}</div>
+                  <div className="plan-card__price-row">
+                    {plan.originalPrice && (
+                      <span className="plan-card__price-label">Por</span>
+                    )}
+                    <div className="plan-card__price">{formatPrice(plan.price)}</div>
+                  </div>
                   <div className="plan-card__period">por {plan.period}</div>
                   {savings && (
-                    <span className="plan-card__savings">Economize {formatPrice(savings)}</span>
+                    <span className="plan-card__savings">🔥 Economize {formatPrice(savings)}</span>
                   )}
                   {plan.isOffer && plan.offerText && (
                     <span className="plan-card__note">{plan.offerText}</span>

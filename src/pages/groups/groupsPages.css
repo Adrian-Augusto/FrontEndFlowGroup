@@ -172,6 +172,13 @@
   border-radius: var(--radius-md);
   font-family: inherit;
   font-size: 1rem;
+  background-color: var(--color-white);
+  color: var(--color-text);
+}
+
+.groups-form__input option {
+  background-color: var(--color-white);
+  color: var(--color-text);
 }
 
 .groups-form__textarea {

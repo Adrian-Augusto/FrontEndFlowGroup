@@ -107,6 +107,20 @@
   font-weight: 600;
 }
 
+.header__link--publish {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-purple-600);
+  color: #fff;
+  font-weight: 600;
+  transition: background var(--transition);
+}
+
+.header__link--publish:hover {
+  background: var(--color-purple-700);
+  color: #fff;
+}
+
 .header__link.active {
   color: var(--color-purple-600);
 }
