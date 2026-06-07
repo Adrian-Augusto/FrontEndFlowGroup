@@ -11,7 +11,9 @@ export function FeaturedGroupsSection({ groups }) {
   useEffect(() => {
     const loadFeaturedGroups = async () => {
       try {
+        console.log("[FeaturedGroupsSection] Buscando grupos destacados da API...");
         const featured = await groupsApi.listFeatured();
+        console.log("[FeaturedGroupsSection] Grupos destacados recebidos:", featured);
         setFeaturedGroups(featured);
       } catch (err) {
         console.error("[FeaturedGroupsSection] Erro ao carregar grupos destacados:", err);
@@ -19,6 +21,7 @@ export function FeaturedGroupsSection({ groups }) {
         const localFeatured = groups.filter(
           (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
         );
+        console.log("[FeaturedGroupsSection] Usando fallback local:", localFeatured);
         setFeaturedGroups(localFeatured);
       }
     };
