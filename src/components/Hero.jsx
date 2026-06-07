@@ -11,12 +11,10 @@ export function Hero() {
         <div className="hero__content">
           <p className="hero__eyebrow">Catálogo de links</p>
           <h1 id="hero-heading" className="hero__title">
-            Grupos do{" "}
-            <span className="hero__highlight">WhatsApp, Telegram e mais</span>
+            Criador de grupos online para equipes e comunidades
           </h1>
           <p className="hero__text">
-            Descubra e publique convites de grupos de outras plataformas — com foto,
-            título, descrição e link direto para entrar.
+            Organize grupos como no Discord ou Telegram. Gerencie membros, equipes e comunidades em um só lugar.
           </p>
           <div className="hero__stats">
             <div className="hero__stat">

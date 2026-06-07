@@ -18,6 +18,8 @@ export function PlatformFilter({ value, onChange }) {
           className={`platform-filter__chip ${value === p.id ? "platform-filter__chip--active" : ""}`}
           onClick={() => onChange(p.id)}
           style={value === p.id ? { "--chip-color": p.color } : undefined}
+          aria-label={`Filtrar por ${p.label}`}
+          aria-pressed={value === p.id}
         >
           {p.label}
         </button>

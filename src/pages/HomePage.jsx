@@ -6,6 +6,7 @@ import { MyGroupsSection } from "../components/MyGroupsSection";
 import { CategoriesSection } from "../components/CategoriesSection";
 import { GroupGrid } from "../components/GroupGrid";
 import { CreateGroupModal } from "../components/CreateGroupModal";
+import { SEOContentSection } from "../components/SEOContentSection";
 import { useGroups } from "../context/GroupsContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/Toast";
@@ -99,6 +100,7 @@ export function HomePage() {
         onCreateClick={handleCreateClick}
         canCreate
       />
+      <SEOContentSection />
       <CreateGroupModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

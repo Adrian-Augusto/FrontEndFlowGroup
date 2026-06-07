@@ -27,7 +27,7 @@ export function FeaturedGroupsSection({ groups }) {
               <Link to="/planos">Ver planos</Link>
             </p>
           </div>
-          <Link to="/planos" className="featured-section__cta">
+          <Link to="/planos" className="featured-section__cta" aria-label="Ver planos para patrocinar grupo">
             Patrocinar meu grupo
           </Link>
         </header>

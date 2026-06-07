@@ -59,7 +59,7 @@ export function CategoriesSection({ groups = [], onCategorySelect = () => {}, se
   };
 
   return (
-    <div className="categories-container">
+    <section className="categories-container" aria-label="Filtro de categorias">
       {/* Botão Hamburger para mobile */}
       <button
         className={`categories-hamburger ${sidebarOpen ? "active" : ""}`}
@@ -104,9 +104,9 @@ export function CategoriesSection({ groups = [], onCategorySelect = () => {}, se
           </button>
         </header>
 
-        <div className="categories-sidebar__list">
+        <nav className="categories-sidebar__list" aria-label="Navegação por categorias">
           {CATEGORIES_SECTIONS.map((section) => (
-            <div key={section.title} className="category-section">
+            <section key={section.title} className="category-section">
               <button
                 className={`category-section__header ${
                   expandedSections[section.title] ? "active" : ""
@@ -145,9 +145,9 @@ export function CategoriesSection({ groups = [], onCategorySelect = () => {}, se
                   })}
                 </div>
               )}
-            </div>
+            </section>
           ))}
-        </div>
+        </nav>
       </aside>
 
       {/* Botão para abrir quando minimizado */}
@@ -161,6 +161,6 @@ export function CategoriesSection({ groups = [], onCategorySelect = () => {}, se
           &gt;
         </button>
       )}
-    </div>
+    </section>
   );
 }

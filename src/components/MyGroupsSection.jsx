@@ -10,9 +10,9 @@ export function MyGroupsSection() {
   }
 
   return (
-    <section className="my-groups-section">
+    <section className="my-groups-section" aria-label="Meus grupos">
       <div className="my-groups-section__inner">
-        <Link to="/meus-grupos" className="my-groups-section__button">
+        <Link to="/meus-grupos" className="my-groups-section__button" aria-label="Ver meus grupos">
           Meus grupos
         </Link>
       </div>
