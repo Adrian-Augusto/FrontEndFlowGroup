@@ -36,15 +36,37 @@ export function GroupCard({ group, showStatus = false, showFeaturedBadge = false
     }
   };
 
+  const sponsoredStyle = showFeaturedBadge ? {
+    border: "2px solid #fbbf24",
+    boxShadow: "0 4px 20px rgba(251, 191, 36, 0.3)",
+    background: "linear-gradient(135deg, #fffbeb 0%, #ffffff 100%)"
+  } : {};
+
+  const sponsoredHoverStyle = showFeaturedBadge ? {
+    borderColor: "#f59e0b",
+    boxShadow: "0 8px 30px rgba(251, 191, 36, 0.4)"
+  } : {};
+
   return (
     <article
       className={`group-card ${canOpen ? "group-card--clickable" : ""} ${
         showFeaturedBadge ? "group-card--sponsored" : ""
       }`}
+      style={sponsoredStyle}
       role={canOpen ? "link" : undefined}
       tabIndex={canOpen ? 0 : undefined}
       onClick={openGroup}
       onKeyDown={handleKeyDown}
+      onMouseEnter={(e) => {
+        if (showFeaturedBadge) {
+          Object.assign(e.currentTarget.style, sponsoredHoverStyle);
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (showFeaturedBadge) {
+          Object.assign(e.currentTarget.style, sponsoredStyle);
+        }
+      }}
     >
       <div className="group-card__cover">
         <img
