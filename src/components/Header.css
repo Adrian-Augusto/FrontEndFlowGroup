@@ -121,6 +121,11 @@
   color: #fff;
 }
 
+.header__link--publish.active {
+  background: var(--color-purple-700);
+  color: #fff;
+}
+
 .header__link.active {
   color: var(--color-purple-600);
 }
@@ -278,12 +283,20 @@
   }
 
   .header__link--publish {
+    flex: 1 1 calc(50% - 0.175rem);
     background: var(--color-purple-600);
     color: #fff;
     font-weight: 600;
+    padding: 0.65rem 0.75rem;
+    white-space: nowrap;
   }
 
   .header__link--publish:hover {
+    background: var(--color-purple-700);
+    color: #fff;
+  }
+
+  .header__link--publish.active {
     background: var(--color-purple-700);
     color: #fff;
   }
