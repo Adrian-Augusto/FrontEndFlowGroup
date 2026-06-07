@@ -24,3 +24,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+SECURITY_AUDIT.md
+SECURITY_HEADERS.md

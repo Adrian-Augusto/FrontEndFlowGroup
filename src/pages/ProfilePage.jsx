@@ -168,15 +168,14 @@ export function ProfilePage() {
                       referrerPolicy="no-referrer"
                       onError={(e) => {
                         e.target.style.display = 'none';
-                        e.target.nextElementSibling?.classList.add('profile-page__photo--fallback');
+                        e.target.parentElement?.classList.add('profile-page__hero--no-photo');
                       }}
                     />
-                  ) : null}
-                  {!user.avatarUrl || typeof user.avatarUrl !== 'string' || user.avatarUrl.length === 0 ? (
+                  ) : (
                     <span className="profile-page__photo profile-page__photo--fallback" aria-hidden="true">
                       {displayName.charAt(0).toUpperCase()}
                     </span>
-                  ) : null}
+                  )}
                   <div>
                     <h2 className="profile-page__name">{displayName}</h2>
                     <p className="profile-page__email">{user.email ?? "—"}</p>
