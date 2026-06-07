@@ -11,10 +11,10 @@ export function Hero() {
         <div className="hero__content">
           <p className="hero__eyebrow">Catálogo de links</p>
           <h1 id="hero-heading" className="hero__title">
-            Criador de grupos online para equipes e comunidades
+            Plataforma para organizar e gerenciar seus grupos
           </h1>
           <p className="hero__text">
-            Organize grupos como no Discord ou Telegram. Gerencie membros, equipes e comunidades em um só lugar.
+            Descubra novos grupos, organize suas comunidades e gerencie tudo em um só lugar. Simples e eficiente.
           </p>
           <div className="hero__stats">
             <div className="hero__stat">
