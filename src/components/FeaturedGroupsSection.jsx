@@ -14,14 +14,25 @@ export function FeaturedGroupsSection({ groups }) {
         console.log("[FeaturedGroupsSection] Buscando grupos destacados da API...");
         const featured = await groupsApi.listFeatured();
         console.log("[FeaturedGroupsSection] Grupos destacados recebidos:", featured);
-        setFeaturedGroups(featured);
+
+        // Se API retornar array vazio, usar fallback local
+        if (!featured || featured.length === 0) {
+          console.log("[FeaturedGroupsSection] API retornou array vazio, usando fallback local");
+          const localFeatured = groups.filter(
+            (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
+          );
+          console.log("[FeaturedGroupsSection] Grupos locais encontrados:", localFeatured);
+          setFeaturedGroups(localFeatured);
+        } else {
+          setFeaturedGroups(featured);
+        }
       } catch (err) {
         console.error("[FeaturedGroupsSection] Erro ao carregar grupos destacados:", err);
         // Fallback para dados locais se API falhar
         const localFeatured = groups.filter(
           (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
         );
-        console.log("[FeaturedGroupsSection] Usando fallback local:", localFeatured);
+        console.log("[FeaturedGroupsSection] Usando fallback local (erro):", localFeatured);
         setFeaturedGroups(localFeatured);
       }
     };
