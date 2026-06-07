@@ -91,30 +91,13 @@ export const authService = {
    */
   async getCurrentUser() {
     try {
-      console.log("[authService] Buscando perfil do usuário...");
       const response = await api.getGoogleProfile();
       // getGoogleProfile retorna { data: user, raw: response, token? }
       const user = response?.data;
       if (!user) {
         throw new Error("Usuário não autenticado ou resposta inválida");
       }
-      console.log("[authService] Usuário extraído:", {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        termos_aceitos: user.termos_aceitos,
-        termsAccepted: user.termsAccepted,
-      });
       memoryUser = user;
-      console.log("[authService] Usuário definido na memória:", {
-        id: memoryUser.id,
-        email: memoryUser.email,
-        name: memoryUser.name,
-        role: memoryUser.role,
-        termos_aceitos: memoryUser.termos_aceitos,
-        termsAccepted: memoryUser.termsAccepted,
-      });
 
       return memoryUser;
     } catch (err) {

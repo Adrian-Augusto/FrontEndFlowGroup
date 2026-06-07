@@ -26,10 +26,6 @@ export function GroupsProvider({ children }) {
       }
       const groupsData = Array.isArray(data) ? data : [];
       setGroups(groupsData);
-      console.log("[DEBUG] Grupos carregados:", {
-        count: groupsData.length,
-        statuses: groupsData.map((g) => ({ id: g.id, status: g.status || "undefined" })),
-      });
     } catch (err) {
       setGroups([]);
       setError(err?.message ?? "Não foi possível carregar os grupos.");
@@ -129,3 +125,4 @@ export function useGroups() {
   if (!ctx) throw new Error("useGroups deve ser usado dentro de GroupsProvider");
   return ctx;
 }
+

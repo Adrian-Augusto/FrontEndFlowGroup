@@ -26,8 +26,6 @@ export function LoginSuccessPage() {
           throw new Error("Perfil não encontrado após autenticação.");
         }
 
-        console.log("[LoginSuccessPage] Autenticação concluída com sucesso");
-
         // ── 3. Redireciona para área autenticada ──────────────────
         navigate("/", { replace: true, state: { focusGrupos: true } });
 

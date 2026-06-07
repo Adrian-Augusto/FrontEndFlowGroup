@@ -37,19 +37,11 @@ export const uploadApi = {
     const formData = new FormData();
     formData.append("photo", file);
 
-    console.log("[uploadApi] Iniciando upload de foto:", {
-      name: file.name,
-      size: file.size,
-      type: file.type
-    });
-
     try {
       const data = await request(API_ROUTES.upload.groupPhoto, {
         method: "POST",
         body: formData,
       });
-
-      console.log("[uploadApi] Resposta completa:", data);
 
       const url = normalizeUploadUrl(data?.fullUrl ?? data?.photoUrl ?? data?.url);
 
@@ -57,10 +49,6 @@ export const uploadApi = {
         console.error("[uploadApi] URL não recebida na resposta:", data);
         throw new Error("Servidor não retornou URL de foto");
       }
-
-      console.log("[uploadApi] Upload concluído, URL recebida:", {
-        urlLength: url.length,
-      });
 
       return url;
     } catch (err) {

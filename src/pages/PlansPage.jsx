@@ -39,7 +39,6 @@ export function PlansPage() {
   
   // Receber dados do grupo do state (quando vem do modal de impulsionar)
   const sponsorGroupId = location.state?.groupId;
-  const sponsorGroup = location.state?.group;
 
   const loadUserGroups = useCallback(async () => {
     if (!userId) return;
@@ -94,10 +93,6 @@ export function PlansPage() {
 
     Promise.resolve().then(loadPlans);
   }, []);
-
-  const handlePaymentStart = () => {
-    setSelectedPlanId(null);
-  };
 
   const requireLogin = () => {
     if (!isAuthenticated) {

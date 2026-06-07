@@ -51,7 +51,6 @@ export function AuthProvider({ children }) {
     // Se já temos usuário em memória, não precisamos chamar a API
     const existingUser = authService.getUser();
     if (existingUser) {
-      console.log("[AuthContext] Usuário já em memória, usando cache");
       syncUser(existingUser);
       setLoading(false);
       return;
@@ -66,7 +65,6 @@ export function AuthProvider({ children }) {
   // Listen for logout events (triggered by 401/403 responses from API)
   useEffect(() => {
     const onLogout = () => {
-      console.log("[AuthContext] Logout event received - clearing session");
       authService.clearSession();
       setUser(null);
       setProfileError(null);
@@ -77,7 +75,6 @@ export function AuthProvider({ children }) {
 
   const startGoogleLogin = useCallback((returnPath = "/") => {
     const loginUrl = getGoogleLoginUrl(returnPath);
-    console.log("[AuthContext] Starting Google OAuth flow");
     window.location.href = loginUrl;
   }, []);
 
@@ -171,3 +168,4 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth deve ser usado dentro de AuthProvider");
   return ctx;
 }
+

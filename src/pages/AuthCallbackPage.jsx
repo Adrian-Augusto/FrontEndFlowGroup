@@ -23,11 +23,6 @@ export function AuthCallbackPage() {
       const errorParam = params.get("error");
       const tokenParam = params.get("token");
 
-      console.log("[AuthCallbackPage] OAuth callback iniciado", {
-        hasToken: !!tokenParam,
-        hasError: !!errorParam,
-      });
-
       // ── 1.5. Se backend enviou token na query, armazena em sessionStorage ─
       if (tokenParam) {
         authService.setAccessToken(tokenParam);
@@ -55,8 +50,6 @@ export function AuthCallbackPage() {
         // ── 4. Aguarda um pouco para cookies serem definidos ──
         // Em alguns casos, o cookie pode chegar após o redirect
         await new Promise((resolve) => setTimeout(resolve, 100));
-
-        console.log("[AuthCallbackPage] Buscando perfil do backend...");
 
         // ── 5. Busca perfil via cookie HttpOnly ou Bearer token ──
         // refreshProfile agora retorna o usuário e armazena token automaticamente
@@ -98,9 +91,6 @@ export function AuthCallbackPage() {
         console.error("[AuthCallbackPage] Erro durante callback:", err.message);
         
         // Debug: mostrar status do auth
-        console.debug("[AuthCallbackPage] Debug info:", {
-          cookies: document.cookie ? document.cookie.substring(0, 50) : "nenhum",
-        });
 
         setStatus("error");
         setErrorMsg("Não foi possível concluir o login. Tente novamente.");

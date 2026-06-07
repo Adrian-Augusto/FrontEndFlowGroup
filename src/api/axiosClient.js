@@ -51,14 +51,6 @@ httpClient.interceptors.request.use((config) => {
     config.headers["Content-Type"] = "application/json";
   }
 
-  // Debug: log request details (sem expor token)
-  console.log("[axiosClient] Request:", {
-    url: config.url,
-    method: config.method,
-    withCredentials: config.withCredentials,
-    hasAuthHeader: !!config.headers.Authorization,
-  });
-
   return config;
 });
 
@@ -88,7 +80,6 @@ httpClient.interceptors.response.use(
     // Handle 403 Forbidden - trigger logout (user permissions revoked)
     if (error.response?.status === 403 && !skipLogout) {
       // User authenticated but not authorized - also logout
-      console.warn("[axiosClient] Access forbidden (403) - logging out");
       window.dispatchEvent(new CustomEvent(AUTH_LOGOUT_EVENT));
     }
 

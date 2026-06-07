@@ -4,30 +4,11 @@ import { useAuth } from "../context/AuthContext";
 import { useSubscription } from "../context/SubscriptionContext";
 import { getDisplayName } from "../utils/displayUserName";
 import { plansApi } from "../api/plansApi";
-import { PLANS as FALLBACK_PLANS } from "../data/plans";
+import { normalizePlans } from "../utils/planNormalize";
 import { groupsApi } from "../api/groupsApi";
 import { PaymentButton } from "../components/PaymentButton";
 import { SponsorGroupModal } from "../components/SponsorGroupModal";
 import "./ProfilePage.css";
-
-function normalizePlans(apiPlans) {
-  const fallbackMap = {
-    9.9: FALLBACK_PLANS[0], // 3 dias sponsored
-    19.9: FALLBACK_PLANS[1], // 7 dias sponsored
-    29.9: FALLBACK_PLANS[2], // 15 dias premium
-    49.9: FALLBACK_PLANS[3], // 30 dias premium
-  };
-
-  return apiPlans.filter((plan) => Number(plan.price) !== 0.01 && plan.id !== "test").map((plan) => {
-    const priceVal = Number(plan.price);
-    const fallback = fallbackMap[priceVal] || FALLBACK_PLANS[0];
-    return {
-      ...fallback,
-      id: plan.id, // USAR O UUID DA API, não o ID do fallback!
-      price: priceVal,
-    };
-  });
-}
 
 export function ProfilePage() {
   const { user, loading, profileError, refreshProfile } = useAuth();
@@ -301,7 +282,8 @@ export function ProfilePage() {
               ) : availablePlans.length > 0 ? (
                 <div className="profile-page__plans-grid">
                   {availablePlans.map((plan) => {
-                    const isCurrentPlan = isActive && subscription?.planId === plan.id;
+                    const isCurrentPlan =
+                      isActive && (subscription?.planId === plan.id || subscription?.planId === plan.localId);
 
                     return (
                       <div key={plan.id} className={`profile-page__plan-card ${isCurrentPlan ? "profile-page__plan-card--current" : ""}`}>
@@ -324,7 +306,6 @@ export function ProfilePage() {
                           <PaymentButton
                             plan={plan}
                             disabled={false}
-                            onPaymentStart={() => console.log("Iniciando pagamento para plano:", plan.name)}
                           />
                         )}
 

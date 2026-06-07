@@ -39,8 +39,6 @@ export const paymentsApi = {
         idempotencyKey,
       };
 
-      console.log("[Payment API] Enviando payload para impulsionar grupo:", payload);
-
       const response = await apiRequest(API_ROUTES.payments.create, {
         method: "POST",
         data: payload,

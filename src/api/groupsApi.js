@@ -102,13 +102,7 @@ export const groupsApi = {
       let photoUrl;
       if (photoFile instanceof File && photoFile.size > 0) {
         try {
-          console.log("[groupsApi] Tentando upload de foto:", photoFile.name);
           photoUrl = await uploadApi.uploadGroupPhoto(photoFile);
-          console.log("[groupsApi] Upload retornou:", {
-            hasUrl: !!photoUrl,
-            isString: typeof photoUrl === "string",
-            urlLength: photoUrl?.length
-          });
           if (!photoUrl) {
             console.warn("[groupsApi] Upload retornou URL vazia");
             throw new Error("Upload da foto não retornou uma URL válida");
@@ -139,15 +133,6 @@ export const groupsApi = {
       if (!payload.category) {
         throw new Error("Categoria é obrigatória");
       }
-
-      console.log("Creating group with payload:", {
-        title: nameValue,
-        description: descriptionValue,
-        link: linkValue,
-        platform: platformValue,
-        photoUrl: `${photoUrl.substring(0, 50)}...`,
-        category: payload.category,
-      });
 
       const data = await request(API_ROUTES.groups.create, { method: "POST", body: payload });
       return normalizeGroup(data?.data ?? data);
@@ -226,7 +211,6 @@ export const groupsApi = {
       let finalPhotoUrl = photoUrl;
       if (photoFile instanceof File && photoFile.size > 0) {
         try {
-          console.log("[groupsApi] Tentando upload de foto no update:", photoFile.name);
           finalPhotoUrl = await uploadApi.uploadGroupPhoto(photoFile);
         } catch (err) {
           console.error("[groupsApi] Erro ao fazer upload da foto no update:", err);
