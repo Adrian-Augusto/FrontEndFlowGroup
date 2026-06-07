@@ -23,27 +23,7 @@ export function SideAdBanner() {
       </button>
 
       <div className="side-ad-banner__content">
-        <h3 className="side-ad-banner__title">Promova seu grupo!</h3>
-        
-        <p className="side-ad-banner__text">
-          Aumente a visibilidade do seu grupo com nosso plano premium.
-        </p>
-
-        <div className="side-ad-banner__features">
-          <div className="side-ad-banner__feature">
-            ✓ Destaque especial
-          </div>
-          <div className="side-ad-banner__feature">
-            ✓ Mais visibilidade
-          </div>
-          <div className="side-ad-banner__feature">
-            ✓ Suporte prioritário
-          </div>
-        </div>
-
-        <button className="side-ad-banner__cta">
-          Saiba mais
-        </button>
+        {/* Google AdSense will be placed here */}
       </div>
     </aside>
   );
