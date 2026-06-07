@@ -40,6 +40,12 @@ export function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Log para debug
+  useEffect(() => {
+    console.log("[HomePage] approvedGroups:", approvedGroups);
+    console.log("[HomePage] Grupos com featured:", approvedGroups.filter(g => g.featured));
+  }, [approvedGroups]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [platformFilter, setPlatformFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
