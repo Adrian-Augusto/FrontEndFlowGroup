@@ -1,43 +1,12 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { GroupCard } from "./GroupCard";
-import { groupsApi } from "../api/groupsApi";
 import "./FeaturedGroupsSection.css";
 
 /** Vitrine pública na Home para grupos patrocinados ou com plano premium ativo. */
 export function FeaturedGroupsSection({ groups }) {
-  const [featuredGroups, setFeaturedGroups] = useState([]);
-
-  useEffect(() => {
-    const loadFeaturedGroups = async () => {
-      try {
-        console.log("[FeaturedGroupsSection] Buscando grupos destacados da API...");
-        const featured = await groupsApi.listFeatured();
-        console.log("[FeaturedGroupsSection] Grupos destacados recebidos:", featured);
-
-        // Se API retornar array vazio, usar fallback local
-        if (!featured || featured.length === 0) {
-          console.log("[FeaturedGroupsSection] API retornou array vazio, usando fallback local");
-          const localFeatured = groups.filter(
-            (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
-          );
-          console.log("[FeaturedGroupsSection] Grupos locais encontrados:", localFeatured);
-          setFeaturedGroups(localFeatured);
-        } else {
-          setFeaturedGroups(featured);
-        }
-      } catch (err) {
-        console.error("[FeaturedGroupsSection] Erro ao carregar grupos destacados:", err);
-        // Fallback para dados locais se API falhar
-        const localFeatured = groups.filter(
-          (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
-        );
-        console.log("[FeaturedGroupsSection] Usando fallback local (erro):", localFeatured);
-        setFeaturedGroups(localFeatured);
-      }
-    };
-    loadFeaturedGroups();
-  }, [groups]);
+  const featuredGroups = groups.filter(
+    (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
+  );
 
   if (featuredGroups.length === 0) {
     return null;
