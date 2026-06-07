@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { plansApi } from "../api/plansApi";
 import { groupsApi } from "../api/groupsApi";
 import { PLANS as FALLBACK_PLANS } from "../data/plans";
+import { normalizePlans } from "../utils/planNormalize";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/Toast";
 import { PaymentButton } from "../components/PaymentButton";
@@ -25,36 +26,12 @@ function getSavings(plan) {
   return plan.originalPrice - plan.price;
 }
 
-function normalizePlans(apiPlans) {
-  const fallbackByPrice = new Map([
-    [9.9, FALLBACK_PLANS[0]],
-    [19.9, FALLBACK_PLANS[1]],
-    [29.9, FALLBACK_PLANS[2]],
-    [49.9, FALLBACK_PLANS[3]],
-  ]);
-
-  return apiPlans
-    .filter((plan) => Number(plan.price) !== 0.01 && plan.id !== "test")
-    .map((plan) => {
-      const priceVal = Number(plan.price);
-      const priceKey = Math.round(priceVal * 100) / 100;
-      const fallback = fallbackByPrice.get(priceKey) || FALLBACK_PLANS[0];
-
-      return {
-        ...fallback,
-        id: plan.id,
-        price: priceVal,
-      };
-    });
-}
-
 export function PlansPage() {
   const { isAuthenticated, user } = useAuth();
   const userId = user?.id;
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [plans, setPlans] = useState(FALLBACK_PLANS);
   const [loading, setLoading] = useState(false);
   const [userGroups, setUserGroups] = useState([]);
@@ -105,12 +82,7 @@ export function PlansPage() {
           plansData = FALLBACK_PLANS;
         }
 
-        plansData = plansData.filter((plan) => Number(plan.price) !== 0.01 && plan.id !== "test");
-
-        const fallbackIds = ["three-days", "seven-days", "fifteen-days", "monthly"];
-        const isBackendResponse =
-          plansData?.length && plansData[0].id && !fallbackIds.includes(plansData[0].id);
-        const normalized = isBackendResponse ? normalizePlans(plansData) : plansData;
+        const normalized = normalizePlans(plansData);
         setPlans(normalized?.length ? normalized : FALLBACK_PLANS);
       } catch (err) {
         console.error("[PlansPage] Erro ao carregar planos:", err);
@@ -127,14 +99,12 @@ export function PlansPage() {
     setSelectedPlanId(null);
   };
 
-  const handlePlanClick = (planId) => {
+  const requireLogin = () => {
     if (!isAuthenticated) {
       showToast("Faça login para contratar um plano.");
       navigate("/login", { state: { from: "/planos" } });
-      return;
     }
 
-    setSelectedPlanId(planId);
   };
 
   if (loading) {
@@ -221,13 +191,13 @@ export function PlansPage() {
                   ))}
                 </ul>
 
-                {selectedPlanId === plan.id && isAuthenticated ? (
-                  <PaymentButton plan={plan} groupId={sponsorGroupId} onPaymentStart={handlePaymentStart} />
+                {isAuthenticated ? (
+                  <PaymentButton plan={plan} groupId={sponsorGroupId} />
                 ) : (
                   <button
                     type="button"
                     className={`plan-card__button ${plan.popular ? "plan-card__button--solid" : ""}`}
-                    onClick={() => handlePlanClick(plan.id)}
+                    onClick={requireLogin}
                   >
                     Contratar {plan.name}
                   </button>
