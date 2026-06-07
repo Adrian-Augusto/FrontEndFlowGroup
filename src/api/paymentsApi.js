@@ -56,7 +56,8 @@ export const paymentsApi = {
 
       console.log("[paymentsApi] Resposta do backend:", {
         hasInitPoint: !!response.init_point,
-        responseKeys: Object.keys(response)
+        responseKeys: Object.keys(response),
+        fullResponse: response
       });
 
       if (!response?.init_point) {
@@ -67,6 +68,11 @@ export const paymentsApi = {
     } catch (err) {
       const msg = err.response?.data?.message ?? err.message ?? "Erro ao criar pagamento";
       console.error("[paymentsApi] Erro:", msg, err);
+      console.error("[paymentsApi] Detalhes do erro:", {
+        response: err.response,
+        data: err.response?.data,
+        status: err.response?.status
+      });
       throw new Error(msg);
     }
   },
