@@ -38,7 +38,25 @@ export function PlansPage() {
   const [loadingGroups, setLoadingGroups] = useState(false);
   
   // Receber dados do grupo do state (quando vem do modal de impulsionar)
-  const sponsorGroupId = location.state?.groupId;
+  const sponsorGroupId = location.state?.groupId || sessionStorage.getItem('sponsorGroupId');
+
+  // Persistir groupId no sessionStorage para não perder durante redirecionamento
+  useEffect(() => {
+    if (sponsorGroupId) {
+      sessionStorage.setItem('sponsorGroupId', sponsorGroupId);
+      console.log("[PlansPage] groupId salvo no sessionStorage:", sponsorGroupId);
+    }
+  }, [sponsorGroupId]);
+
+  // Log para debug
+  useEffect(() => {
+    console.log("[PlansPage] Dados do grupo recebidos:", {
+      sponsorGroupId,
+      hasGroupId: !!sponsorGroupId,
+      locationState: location.state,
+      sessionStorageGroupId: sessionStorage.getItem('sponsorGroupId')
+    });
+  }, [sponsorGroupId, location.state]);
 
   const loadUserGroups = useCallback(async () => {
     if (!userId) return;

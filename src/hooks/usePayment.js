@@ -21,7 +21,24 @@ export function usePayment() {
       }
 
       const userId = user?.id;
+      console.log("[usePayment] Criando pagamento:", {
+        planId,
+        userId,
+        groupId,
+        hasGroupId: !!groupId
+      });
       const response = await paymentsApi.createPayment(planId, userId, groupId);
+
+      console.log("[usePayment] Resposta do backend:", {
+        hasInitPoint: !!response.init_point,
+        responseKeys: Object.keys(response)
+      });
+
+      // Limpar sessionStorage após iniciar pagamento
+      if (groupId) {
+        sessionStorage.removeItem('sponsorGroupId');
+        console.log("[usePayment] groupId removido do sessionStorage");
+      }
 
       // Redirect seguro para Mercado Pago
       if (response.init_point) {

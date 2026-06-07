@@ -39,9 +39,24 @@ export const paymentsApi = {
         idempotencyKey,
       };
 
+      console.log("[paymentsApi] Enviando payload para backend:", {
+        endpoint: API_ROUTES.payments.create,
+        payload: {
+          planId,
+          groupId,
+          hasGroupId: !!groupId,
+          idempotencyKey
+        }
+      });
+
       const response = await apiRequest(API_ROUTES.payments.create, {
         method: "POST",
         data: payload,
+      });
+
+      console.log("[paymentsApi] Resposta do backend:", {
+        hasInitPoint: !!response.init_point,
+        responseKeys: Object.keys(response)
       });
 
       if (!response?.init_point) {
@@ -51,6 +66,7 @@ export const paymentsApi = {
       return response;
     } catch (err) {
       const msg = err.response?.data?.message ?? err.message ?? "Erro ao criar pagamento";
+      console.error("[paymentsApi] Erro:", msg, err);
       throw new Error(msg);
     }
   },

@@ -32,6 +32,11 @@ export function SponsorGroupModal({ isOpen, onClose, onSponsorSuccess, userGroup
 
     // Redirecionar para página de planos com dados do grupo
     const selectedGroup = userGroups.find(g => g.id === selectedGroupId);
+    console.log("[SponsorGroupModal] Redirecionando para planos:", {
+      selectedGroupId,
+      selectedGroup,
+      hasGroup: !!selectedGroup
+    });
     onClose();
     navigate("/planos", { state: { groupId: selectedGroupId, group: selectedGroup } });
   };

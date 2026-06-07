@@ -13,6 +13,11 @@ export function PaymentButton({ plan, groupId = null, disabled = false, onPaymen
   const handleClick = async () => {
     clearError();
     onPaymentStart?.();
+    console.log("[PaymentButton] Iniciando pagamento:", {
+      planId: plan.id,
+      groupId,
+      hasGroupId: !!groupId
+    });
     await createPayment(plan.id, groupId);
   };
 
