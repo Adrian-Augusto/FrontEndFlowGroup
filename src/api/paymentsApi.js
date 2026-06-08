@@ -44,6 +44,7 @@ export const paymentsApi = {
         payload: {
           planId,
           groupId,
+          userId,
           hasGroupId: !!groupId,
           idempotencyKey
         }
