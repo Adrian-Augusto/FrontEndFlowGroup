@@ -125,6 +125,10 @@ export function PlansPage() {
     window.location.reload();
   };
 
+  const handleChangeGroup = () => {
+    setShowGroupSelector(true);
+  };
+
   useEffect(() => {
     if (isAuthenticated && userId) {
       Promise.resolve().then(loadUserGroups);
@@ -208,15 +212,11 @@ export function PlansPage() {
             <div className="plans-selected-group__info">
               <span className="plans-selected-group__label">Grupo selecionado para patrocinar:</span>
               <h3 className="plans-selected-group__name">{selectedGroup.title}</h3>
-              <p className="plans-selected-group__description">{selectedGroup.description}</p>
             </div>
             <button
               type="button"
               className="plans-selected-group__change"
-              onClick={() => {
-                sessionStorage.removeItem('sponsorGroupId');
-                navigate('/');
-              }}
+              onClick={() => setShowGroupSelector(true)}
             >
               Alterar grupo
             </button>
@@ -253,11 +253,10 @@ export function PlansPage() {
                 </button>
               </div>
               <ul className="plans-group-selector__list">
-                {availableGroups.map((group) => (
+                {userGroups.map((group) => (
                   <li key={group.id} className="plans-group-selector__item">
                     <div className="plans-group-selector__item-info">
                       <h4>{group.title}</h4>
-                      <p>{group.description}</p>
                     </div>
                     <button
                       type="button"

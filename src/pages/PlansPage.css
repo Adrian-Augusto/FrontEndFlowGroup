@@ -113,11 +113,6 @@
   color: var(--color-text);
 }
 
-.plans-selected-group__description {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-}
 
 .plans-selected-group__change {
   padding: 0.5rem 1rem;
