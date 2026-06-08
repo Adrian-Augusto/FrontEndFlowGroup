@@ -77,6 +77,15 @@ export function PlansPage() {
   // Buscar grupo selecionado para patrocinar
   const selectedGroup = userGroups.find((g) => g.id === sponsorGroupId);
 
+  // Log para debug
+  useEffect(() => {
+    console.log("[PlansPage] Debug grupo selecionado:", {
+      sponsorGroupId,
+      userGroups: userGroups.map(g => ({ id: g.id, title: g.title })),
+      selectedGroup: selectedGroup ? { id: selectedGroup.id, title: selectedGroup.title } : null
+    });
+  }, [sponsorGroupId, userGroups, selectedGroup]);
+
   // Filtrar grupos já patrocinados
   const sponsoredGroups = userGroups.filter(
     (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
