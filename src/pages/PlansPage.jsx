@@ -74,6 +74,14 @@ export function PlansPage() {
     }
   }, [userId]);
 
+  // Buscar grupo selecionado para patrocinar
+  const selectedGroup = userGroups.find((g) => g.id === sponsorGroupId);
+
+  // Filtrar grupos já patrocinados
+  const sponsoredGroups = userGroups.filter(
+    (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
+  );
+
   useEffect(() => {
     if (isAuthenticated && userId) {
       Promise.resolve().then(loadUserGroups);
@@ -150,6 +158,42 @@ export function PlansPage() {
             )}
           </div>
         </div>
+
+        {/* Mostrar grupo selecionado para patrocinar */}
+        {selectedGroup && (
+          <div className="plans-selected-group">
+            <div className="plans-selected-group__info">
+              <span className="plans-selected-group__label">Grupo selecionado para patrocinar:</span>
+              <h3 className="plans-selected-group__name">{selectedGroup.title}</h3>
+              <p className="plans-selected-group__description">{selectedGroup.description}</p>
+            </div>
+            <button
+              type="button"
+              className="plans-selected-group__change"
+              onClick={() => {
+                sessionStorage.removeItem('sponsorGroupId');
+                navigate('/');
+              }}
+            >
+              Alterar grupo
+            </button>
+          </div>
+        )}
+
+        {/* Mostrar grupos já patrocinados */}
+        {sponsoredGroups.length > 0 && (
+          <div className="plans-sponsored-groups">
+            <h3 className="plans-sponsored-groups__title">Grupos já patrocinados:</h3>
+            <ul className="plans-sponsored-groups__list">
+              {sponsoredGroups.map((group) => (
+                <li key={group.id} className="plans-sponsored-groups__item">
+                  <span className="plans-sponsored-groups__item-name">{group.title}</span>
+                  <span className="plans-sponsored-groups__item-status">✓ Patrocinado</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="plans-grid">
           {(plans || []).map((plan) => {
