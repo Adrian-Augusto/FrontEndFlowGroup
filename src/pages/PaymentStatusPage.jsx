@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useLocation } from "react-router-dom";
 import { paymentsApi } from "../api/paymentsApi";
 import "./PaymentStatusPage.css";
 
@@ -36,11 +36,16 @@ const STATUS_CONFIG = {
 
 export function PaymentStatusPage() {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState(null);
   const [details, setDetails] = useState(null);
 
   const paymentId = searchParams.get("payment_id");
+  const sponsoredGroup = location.state?.sponsoredGroup || 
+    (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('sponsoredGroup') 
+      ? JSON.parse(sessionStorage.getItem('sponsoredGroup')) 
+      : null);
 
   useEffect(() => {
     if (!paymentId) {
@@ -65,6 +70,13 @@ export function PaymentStatusPage() {
 
     checkPaymentStatus();
   }, [paymentId]);
+
+  // Limpar sessionStorage após carregar
+  useEffect(() => {
+    if (sponsoredGroup && typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('sponsoredGroup');
+    }
+  }, [sponsoredGroup]);
 
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.error;
 
@@ -104,6 +116,12 @@ export function PaymentStatusPage() {
                   <>
                     <dt>Plano</dt>
                     <dd>{details.planName}</dd>
+                  </>
+                )}
+                {sponsoredGroup && (
+                  <>
+                    <dt>Grupo Patrocinado</dt>
+                    <dd>{sponsoredGroup.title}</dd>
                   </>
                 )}
                 {details.expiresAt && (

@@ -34,6 +34,20 @@ export function usePayment() {
         responseKeys: Object.keys(response)
       });
 
+      // Salvar grupo patrocinado no state para mostrar na página de status
+      if (groupId) {
+        // Buscar dados do grupo para passar para a página de status
+        const groups = await import("../api/groupsApi").then(m => m.groupsApi.listApproved());
+        const sponsoredGroup = groups.find(g => g.id === groupId);
+        
+        // Passar grupo patrocinado via state (não funciona com window.location.href)
+        // Precisamos usar navigate em vez de window.location.href
+        // Mas por enquanto vamos salvar no sessionStorage
+        if (sponsoredGroup) {
+          sessionStorage.setItem('sponsoredGroup', JSON.stringify(sponsoredGroup));
+        }
+      }
+
       // Limpar sessionStorage após iniciar pagamento
       if (groupId) {
         sessionStorage.removeItem('sponsorGroupId');
