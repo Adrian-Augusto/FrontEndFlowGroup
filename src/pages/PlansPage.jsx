@@ -36,6 +36,8 @@ export function PlansPage() {
   const [loading, setLoading] = useState(false);
   const [userGroups, setUserGroups] = useState([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
+  const [showGroupSelector, setShowGroupSelector] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   
   // Receber dados do grupo do state (quando vem do modal de impulsionar)
   const sponsorGroupId = location.state?.groupId || sessionStorage.getItem('sponsorGroupId');
@@ -90,6 +92,38 @@ export function PlansPage() {
   const sponsoredGroups = userGroups.filter(
     (g) => g.featured || (g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
   );
+
+  // Filtrar grupos disponíveis para patrocinar (não patrocinados ainda)
+  const availableGroups = userGroups.filter(
+    (g) => !g.featured && !(g.hasActivePlan && g.planExpiry && new Date(g.planExpiry) > new Date())
+  );
+
+  const handlePlanClick = (plan) => {
+    if (!isAuthenticated) {
+      requireLogin();
+      return;
+    }
+
+    if (!selectedGroup && availableGroups.length > 0) {
+      // Se não tem grupo selecionado e há grupos disponíveis, mostrar seletor
+      setSelectedPlan(plan);
+      setShowGroupSelector(true);
+    } else if (!selectedGroup && availableGroups.length === 0) {
+      // Se não tem grupos disponíveis, avisar
+      showToast("Você não tem grupos disponíveis para patrocinar. Crie um grupo primeiro.");
+      navigate('/');
+    } else {
+      // Se já tem grupo selecionado, prosseguir com pagamento
+      // O PaymentButton vai usar o selectedGroup
+    }
+  };
+
+  const handleGroupSelect = (group) => {
+    sessionStorage.setItem('sponsorGroupId', group.id);
+    setShowGroupSelector(false);
+    // Recarregar página para atualizar selectedGroup
+    window.location.reload();
+  };
 
   useEffect(() => {
     if (isAuthenticated && userId) {
@@ -204,6 +238,41 @@ export function PlansPage() {
           </div>
         )}
 
+        {/* Modal de seleção de grupo */}
+        {showGroupSelector && (
+          <div className="plans-group-selector-overlay">
+            <div className="plans-group-selector">
+              <div className="plans-group-selector__header">
+                <h3>Selecione o grupo para patrocinar</h3>
+                <button
+                  type="button"
+                  className="plans-group-selector__close"
+                  onClick={() => setShowGroupSelector(false)}
+                >
+                  ×
+                </button>
+              </div>
+              <ul className="plans-group-selector__list">
+                {availableGroups.map((group) => (
+                  <li key={group.id} className="plans-group-selector__item">
+                    <div className="plans-group-selector__item-info">
+                      <h4>{group.title}</h4>
+                      <p>{group.description}</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="plans-group-selector__item-select"
+                      onClick={() => handleGroupSelect(group)}
+                    >
+                      Selecionar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
         <div className="plans-grid">
           {(plans || []).map((plan) => {
             const discountPercent = getDiscountPercent(plan);
@@ -258,7 +327,17 @@ export function PlansPage() {
                 </ul>
 
                 {isAuthenticated ? (
-                  <PaymentButton plan={plan} groupId={sponsorGroupId} />
+                  selectedGroup ? (
+                    <PaymentButton plan={plan} groupId={sponsorGroupId} />
+                  ) : (
+                    <button
+                      type="button"
+                      className={`plan-card__button ${plan.popular ? "plan-card__button--solid" : ""}`}
+                      onClick={() => handlePlanClick(plan)}
+                    >
+                      Selecionar grupo
+                    </button>
+                  )
                 ) : (
                   <button
                     type="button"
