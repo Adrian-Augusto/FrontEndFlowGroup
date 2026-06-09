@@ -63,10 +63,14 @@ export const paymentsApi = {
       console.log("[paymentsApi] Resposta do backend:", {
         hasCheckoutUrl: !!response.checkout_url,
         responseKeys: Object.keys(response),
-        fullResponse: response
+        fullResponse: response,
+        responseType: typeof response,
+        isNull: response === null,
+        isUndefined: response === undefined
       });
 
       if (!response?.checkout_url) {
+        console.error("[paymentsApi] checkout_url não encontrado na resposta:", response);
         throw new Error("Erro ao gerar link de pagamento");
       }
 
