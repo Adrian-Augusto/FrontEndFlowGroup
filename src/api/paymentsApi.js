@@ -25,7 +25,7 @@ export const paymentsApi = {
    *   "idempotencyKey": "user-123-1234567890"
    * }
    */
-  async createPayment(planId, userId = null, groupId = null, subscriptionId = null, externalReference = null) {
+  async createPayment(planId, userId = null, groupId = null) {
     if (!planId) throw new Error("planId é obrigatório");
 
     try {
@@ -37,19 +37,15 @@ export const paymentsApi = {
         planId,
         groupId,
         userId,
-        subscriptionId,
-        externalReference,
         idempotencyKey,
       };
 
-      console.log("[paymentsApi] Enviando payload para backend:", {
+      console.log("[paymentsApi] Enviando payload para backend (Mercado Pago):", {
         endpoint: API_ROUTES.payments.create,
         payload: {
           planId,
           groupId,
           userId,
-          subscriptionId,
-          externalReference,
           hasGroupId: !!groupId,
           idempotencyKey
         }
@@ -60,17 +56,14 @@ export const paymentsApi = {
         data: payload,
       });
 
-      console.log("[paymentsApi] Resposta do backend:", {
-        hasCheckoutUrl: !!response.checkout_url,
+      console.log("[paymentsApi] Resposta do backend (Mercado Pago):", {
+        hasInitPoint: !!response.init_point,
         responseKeys: Object.keys(response),
-        fullResponse: response,
-        responseType: typeof response,
-        isNull: response === null,
-        isUndefined: response === undefined
+        fullResponse: response
       });
 
-      if (!response?.checkout_url) {
-        console.error("[paymentsApi] checkout_url não encontrado na resposta:", response);
+      if (!response?.init_point) {
+        console.error("[paymentsApi] init_point não encontrado na resposta:", response);
         throw new Error("Erro ao gerar link de pagamento");
       }
 

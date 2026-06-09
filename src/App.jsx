@@ -61,6 +61,9 @@ export default function App() {
                     />
                     <Route path="planos" element={<PlansPage />} />
                     <Route path="payment-status" element={<PaymentStatusPage />} />
+                    <Route path="success" element={<PaymentSuccessPage />} />
+                    <Route path="failure" element={<PaymentFailurePage />} />
+                    <Route path="pending" element={<PaymentPendingPage />} />
                     <Route path="admin" element={<AdminRoute />}>
                       <Route index element={<AdminPage />} />
                       <Route path="online-users" element={<OnlineUsersPage />} />

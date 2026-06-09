@@ -11,7 +11,7 @@ export function usePayment() {
   const [error, setError] = useState(null);
   const { user } = useAuth();
 
-  const createPayment = useCallback(async (planId, groupId = null, subscriptionId = null, externalReference = null) => {
+  const createPayment = useCallback(async (planId, groupId = null) => {
     setLoading(true);
     setError(null);
 
@@ -21,30 +21,25 @@ export function usePayment() {
       }
 
       const userId = user?.id;
-      console.log("[usePayment] Criando pagamento:", {
+      console.log("[usePayment] Criando pagamento (Mercado Pago):", {
         planId,
         userId,
         groupId,
-        subscriptionId,
-        externalReference,
         hasGroupId: !!groupId
       });
-      const response = await paymentsApi.createPayment(planId, userId, groupId, subscriptionId, externalReference);
+      const response = await paymentsApi.createPayment(planId, userId, groupId);
 
-      console.log("[usePayment] Resposta do backend:", {
-        hasCheckoutUrl: !!response.checkout_url,
+      console.log("[usePayment] Resposta do backend (Mercado Pago):", {
+        hasInitPoint: !!response.init_point,
         responseKeys: Object.keys(response)
       });
 
-      // Salvar grupo patrocinado no state para mostrar na página de status
+      // Salvar grupo patrocinado no sessionStorage para mostrar na página de status
       if (groupId) {
         // Buscar dados do grupo para passar para a página de status
         const groups = await import("../api/groupsApi").then(m => m.groupsApi.listApproved());
         const sponsoredGroup = groups.find(g => g.id === groupId);
 
-        // Passar grupo patrocinado via state (não funciona com window.location.href)
-        // Precisamos usar navigate em vez de window.location.href
-        // Mas por enquanto vamos salvar no sessionStorage
         if (sponsoredGroup) {
           sessionStorage.setItem('sponsoredGroup', JSON.stringify(sponsoredGroup));
         }
@@ -56,9 +51,9 @@ export function usePayment() {
         console.log("[usePayment] groupId removido do sessionStorage");
       }
 
-      // Redirect seguro para Stripe
-      if (response.checkout_url) {
-        window.location.href = response.checkout_url;
+      // Redirect seguro para Mercado Pago
+      if (response.init_point) {
+        window.location.href = response.init_point;
         return true;
       }
 
