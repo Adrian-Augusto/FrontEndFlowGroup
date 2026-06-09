@@ -11,7 +11,7 @@ export function usePayment() {
   const [error, setError] = useState(null);
   const { user } = useAuth();
 
-  const createPayment = useCallback(async (planId, groupId = null) => {
+  const createPayment = useCallback(async (planId, groupId = null, subscriptionId = null, externalReference = null) => {
     setLoading(true);
     setError(null);
 
@@ -25,12 +25,14 @@ export function usePayment() {
         planId,
         userId,
         groupId,
+        subscriptionId,
+        externalReference,
         hasGroupId: !!groupId
       });
-      const response = await paymentsApi.createPayment(planId, userId, groupId);
+      const response = await paymentsApi.createPayment(planId, userId, groupId, subscriptionId, externalReference);
 
       console.log("[usePayment] Resposta do backend:", {
-        hasInitPoint: !!response.init_point,
+        hasCheckoutUrl: !!response.checkout_url,
         responseKeys: Object.keys(response)
       });
 
@@ -39,7 +41,7 @@ export function usePayment() {
         // Buscar dados do grupo para passar para a página de status
         const groups = await import("../api/groupsApi").then(m => m.groupsApi.listApproved());
         const sponsoredGroup = groups.find(g => g.id === groupId);
-        
+
         // Passar grupo patrocinado via state (não funciona com window.location.href)
         // Precisamos usar navigate em vez de window.location.href
         // Mas por enquanto vamos salvar no sessionStorage
@@ -54,9 +56,9 @@ export function usePayment() {
         console.log("[usePayment] groupId removido do sessionStorage");
       }
 
-      // Redirect seguro para Mercado Pago
-      if (response.init_point) {
-        window.location.href = response.init_point;
+      // Redirect seguro para Stripe
+      if (response.checkout_url) {
+        window.location.href = response.checkout_url;
         return true;
       }
 

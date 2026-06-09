@@ -16,9 +16,11 @@ export function PaymentButton({ plan, groupId = null, disabled = false, onPaymen
     console.log("[PaymentButton] Iniciando pagamento:", {
       planId: plan.id,
       groupId,
+      subscriptionId: plan.subscriptionId,
+      externalReference: plan.externalReference,
       hasGroupId: !!groupId
     });
-    await createPayment(plan.id, groupId);
+    await createPayment(plan.id, groupId, plan.subscriptionId, plan.externalReference);
   };
 
   return (

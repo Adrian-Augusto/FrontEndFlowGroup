@@ -25,7 +25,7 @@ export const paymentsApi = {
    *   "idempotencyKey": "user-123-1234567890"
    * }
    */
-  async createPayment(planId, userId = null, groupId = null) {
+  async createPayment(planId, userId = null, groupId = null, subscriptionId = null, externalReference = null) {
     if (!planId) throw new Error("planId é obrigatório");
 
     try {
@@ -36,6 +36,9 @@ export const paymentsApi = {
       const payload = {
         planId,
         groupId,
+        userId,
+        subscriptionId,
+        externalReference,
         idempotencyKey,
       };
 
@@ -45,6 +48,8 @@ export const paymentsApi = {
           planId,
           groupId,
           userId,
+          subscriptionId,
+          externalReference,
           hasGroupId: !!groupId,
           idempotencyKey
         }
@@ -56,12 +61,12 @@ export const paymentsApi = {
       });
 
       console.log("[paymentsApi] Resposta do backend:", {
-        hasInitPoint: !!response.init_point,
+        hasCheckoutUrl: !!response.checkout_url,
         responseKeys: Object.keys(response),
         fullResponse: response
       });
 
-      if (!response?.init_point) {
+      if (!response?.checkout_url) {
         throw new Error("Erro ao gerar link de pagamento");
       }
 
