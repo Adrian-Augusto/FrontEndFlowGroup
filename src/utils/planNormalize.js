@@ -53,7 +53,13 @@ export function normalizePlans(plans) {
   if (!Array.isArray(plans)) return [];
 
   return plans
-    .filter((plan) => !HIDDEN_PLAN_IDS.has(plan.id) && Number(plan.price) !== 0.01)
+    .filter((plan) => {
+      if (HIDDEN_PLAN_IDS.has(plan.id)) return false;
+      if (Number(plan.price) === 0.01) return false;
+      const duration = Number(plan.durationDays ?? plan.duration);
+      if (duration === 3) return false;
+      return true;
+    })
     .map(normalizePlan)
     .filter(Boolean);
 }
