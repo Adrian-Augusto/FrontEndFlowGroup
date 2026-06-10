@@ -471,6 +471,16 @@
   background: #dc2626;
 }
 
+.admin-table__btn--promote {
+  background: #8b5cf6;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.1);
+}
+
+.admin-table__btn--promote:hover:not(:disabled) {
+  background: #7c3aed;
+}
+
 .admin-table__btn--secondary {
   background: #e2e8f0;
   color: #334155;

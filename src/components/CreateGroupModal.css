@@ -96,13 +96,6 @@
   padding: 0.25rem 0;
 }
 
-.modal__field select option {
-  padding: 0.5rem;
-  font-size: 0.9rem;
-  background-color: var(--color-white);
-  color: var(--color-text);
-}
-
 .modal--wide {
   width: min(100%, 480px);
 }

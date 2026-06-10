@@ -49,6 +49,8 @@ export const API_ROUTES = {
     groupsAll: apiPath("admin", "groups"),
     approve: (id) => apiPath("admin", "groups", id, "approve"),
     reject: (id) => apiPath("admin", "groups", id, "reject"),
+    promote: (id) => apiPath("admin", "groups", id, "promote"),
+    unpromote: (id) => apiPath("admin", "groups", id, "unpromote"),
     delete: (id) => apiPath("admin", "groups", id),
     stats: apiPath("admin", "stats"),
     groupsStats: apiPath("admin", "groups", "stats"),

@@ -115,6 +115,30 @@ export const adminApi = {
     return g;
   },
 
+  async promote(id) {
+    if (!USE_MOCK) {
+      return request(API_ROUTES.admin.promote(id), { method: "PATCH" });
+    }
+    await delay();
+    const groups = loadMockGroups();
+    const g = groups.find((x) => x.id === id);
+    if (g) g.featured = true;
+    localStorage.setItem(STORAGE_GROUPS, JSON.stringify(groups));
+    return g;
+  },
+
+  async unpromote(id) {
+    if (!USE_MOCK) {
+      return request(API_ROUTES.admin.unpromote(id), { method: "PATCH" });
+    }
+    await delay();
+    const groups = loadMockGroups();
+    const g = groups.find((x) => x.id === id);
+    if (g) g.featured = false;
+    localStorage.setItem(STORAGE_GROUPS, JSON.stringify(groups));
+    return g;
+  },
+
   async reject(id, reason) {
     if (!USE_MOCK) {
       return request(API_ROUTES.admin.reject(id), {

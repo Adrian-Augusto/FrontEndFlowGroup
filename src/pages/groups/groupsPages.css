@@ -182,20 +182,6 @@
   background-color: #ffffff;
 }
 
-.groups-form__input option {
-  background-color: #ffffff;
-  color: #1f1633;
-}
-
-.groups-form__input option:checked {
-  background-color: var(--color-purple-600);
-  color: #ffffff;
-}
-
-.groups-form__input option:disabled {
-  color: var(--color-text-muted);
-}
-
 .groups-form__textarea {
   resize: vertical;
   min-height: 120px;

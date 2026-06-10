@@ -67,6 +67,47 @@ export function AdminPage() {
     }
   };
 
+  const handlePromote = async (id, title) => {
+    setActionId(id);
+    try {
+      await adminApi.promote(id);
+      showToast(`“${title}” promovido aos destaques!`);
+      await loadGroups();
+    } catch (err) {
+      showToast(`Erro ao promover: ${err.message}`, "error");
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  const handleApproveFeatured = async (id, title) => {
+    setActionId(id);
+    try {
+      await adminApi.approve(id);
+      await adminApi.promote(id);
+      showToast(`“${title}” aprovado e promovido aos destaques!`);
+      await loadStats();
+      await loadGroups();
+    } catch (err) {
+      showToast(`Erro ao aprovar como destaque: ${err.message}`, "error");
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  const handleUnpromote = async (id, title) => {
+    setActionId(id);
+    try {
+      await adminApi.unpromote(id);
+      showToast(`“${title}” removido dos destaques.`);
+      await loadGroups();
+    } catch (err) {
+      showToast(`Erro ao remover destaque: ${err.message}`, "error");
+    } finally {
+      setActionId(null);
+    }
+  };
+
   const handleReject = async (id, title) => {
     const reason = window.prompt(`Motivo da rejeição (opcional) — ${title}:`);
     if (reason === null) return;
@@ -252,7 +293,7 @@ export function AdminPage() {
                     </td>
                     <td className="admin-table__actions">
                       <div className="admin-table__actions-row">
-                        {g.status === GROUP_STATUS.PENDING ? (
+                        {g.status?.trim().toLowerCase() === "pending" ? (
                           <>
                             <button
                               type="button"
@@ -264,6 +305,14 @@ export function AdminPage() {
                             </button>
                             <button
                               type="button"
+                              className="admin-table__btn admin-table__btn--promote"
+                              disabled={actionId === g.id}
+                              onClick={() => handleApproveFeatured(g.id, g.title)}
+                            >
+                              Destaque
+                            </button>
+                            <button
+                              type="button"
                               className="admin-table__btn admin-table__btn--reject"
                               disabled={actionId === g.id}
                               onClick={() => handleReject(g.id, g.title)}
@@ -271,6 +320,26 @@ export function AdminPage() {
                               Rejeitar
                             </button>
                           </>
+                        ) : g.status?.trim().toLowerCase() === "approved" ? (
+                          g.featured ? (
+                            <button
+                              type="button"
+                              className="admin-table__btn admin-table__btn--secondary"
+                              disabled={actionId === g.id}
+                              onClick={() => handleUnpromote(g.id, g.title)}
+                            >
+                              Remover Destaque
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="admin-table__btn admin-table__btn--promote"
+                              disabled={actionId === g.id}
+                              onClick={() => handlePromote(g.id, g.title)}
+                            >
+                              Promover
+                            </button>
+                          )
                         ) : (
                           <span className="admin-table__muted">—</span>
                         )}
