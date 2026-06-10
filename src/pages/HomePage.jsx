@@ -87,7 +87,7 @@ export function HomePage() {
   return (
     <>
       <CategoriesSection groups={approvedGroups} onCategorySelect={setCategoryFilter} selectedCategory={categoryFilter} />
-      <Hero />
+      <Hero searchQuery={searchQuery} onSearchChange={setSearchQuery} />
       <FeaturedGroupsSection groups={approvedGroups} />
       <MyGroupsSection />
       <GroupGrid

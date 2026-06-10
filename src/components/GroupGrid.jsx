@@ -1,5 +1,4 @@
 import { GroupCard } from "./GroupCard";
-import { SearchBar } from "./SearchBar";
 import { PlatformFilter } from "./PlatformFilter";
 import "./GroupGrid.css";
 
@@ -37,11 +36,11 @@ export function GroupGrid({
         <PlatformFilter value={platformFilter} onChange={onPlatformChange} />
 
         <div className="groups__filters">
-          <SearchBar
-            value={searchQuery}
-            onChange={onSearchChange}
-            resultCount={groups.length}
-          />
+          <p className="search-bar__meta" aria-live="polite" style={{ fontSize: '0.85rem', color: '#64748b' }}>
+            {groups.length === 0
+              ? "Nenhum grupo encontrado"
+              : `${groups.length} grupo${groups.length !== 1 ? "s" : ""} listado${groups.length !== 1 ? "s" : ""}`}
+          </p>
         </div>
 
         {groups.length > 0 ? (
