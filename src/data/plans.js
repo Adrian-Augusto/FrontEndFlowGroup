@@ -7,29 +7,6 @@ export const PLAN_IDS = {
 
 export const PLANS = [
   {
-    id: "three-days",
-    name: "3 Dias Sponsored",
-    emoji: "🕐",
-    price: 9.90,
-    originalPrice: 27.90,
-    period: "3 dias",
-    description: "Destaque seu grupo por 3 dias - Apareça no topo da lista",
-    popular: false,
-    isOffer: true,
-    offerText: "Melhor custo-benefício",
-    categoryIds: [],
-    maxSponsoredGroups: 1,
-    durationDays: 3,
-    type: "SPONSORED_3_DAYS",
-    features: [
-      'Posicionamento em "Grupos em destaque"',
-      'Badge de "Patrocinado" no card',
-      "Visibilidade para todos os visitantes",
-      "Link direto para WhatsApp, Telegram ou similar",
-      "Patrocine 1 grupo por 3 dias",
-    ],
-  },
-  {
     id: "seven-days",
     name: "7 Dias Sponsored",
     emoji: "📅",

@@ -10,7 +10,12 @@ const BACKEND_PLAN_IDS = {
 
 const FALLBACK_BY_DURATION = new Map(FALLBACK_PLANS.map((plan) => [plan.durationDays, plan]));
 const FALLBACK_BY_ID = new Map(FALLBACK_PLANS.map((plan) => [plan.id, plan]));
-const TEST_PLAN_IDS = new Set(["test", "e1042858-a403-4524-90ef-46d5d7a3670c"]);
+const HIDDEN_PLAN_IDS = new Set([
+  "test", 
+  "e1042858-a403-4524-90ef-46d5d7a3670c",
+  "three-days",
+  "9c9fde4e-5115-46d4-b724-13aa9652520e"
+]);
 
 function getPlanDuration(plan) {
   const duration = Number(plan.durationDays ?? plan.duration);
@@ -48,7 +53,7 @@ export function normalizePlans(plans) {
   if (!Array.isArray(plans)) return [];
 
   return plans
-    .filter((plan) => !TEST_PLAN_IDS.has(plan.id) && Number(plan.price) !== 0.01)
+    .filter((plan) => !HIDDEN_PLAN_IDS.has(plan.id) && Number(plan.price) !== 0.01)
     .map(normalizePlan)
     .filter(Boolean);
 }
