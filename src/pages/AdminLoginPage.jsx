@@ -31,10 +31,6 @@ export function AdminLoginPage() {
       <div className="admin-login__card">
         <p className="admin-login__eyebrow">Área restrita</p>
         <h1 className="admin-login__title">Login administrativo</h1>
-        <p className="admin-login__text">
-          Login via <code>POST /api/v1/auth/login</code> — conta com role{" "}
-          <strong>admin</strong>.
-        </p>
 
         {error && (
           <p className="admin-login__error" role="alert">
